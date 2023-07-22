@@ -1,0 +1,79 @@
+version: "3.9"
+services:
+  # bitcoin-core:
+  #   image: ruimarinho/bitcoin-core:24
+  #   container_name: bitcoin-core
+  #   command: -printtoconsole
+  #     -regtest=1
+  #     -rpcallowip=0.0.0.0/0
+  #     -rpcbind=0.0.0.0
+  #     -rpcauth='foo:7d9ba5ae63c3d4dc30583ff4fe65a67e$9e3634e81c11659e3de036d0bf88f89cd169c1039e6e09607562d54765c649cc'
+  #     -fallbackfee=0.0002
+  #     -debug=1
+  #     -wallet=myWallet
+  #     -txindex=1
+  #   ports:
+  #     - 18443:18443
+  #   # if you want to persist blockchain data
+  #   volumes:
+  #     - ./.bitcoin:/home/bitcoin/.bitcoin
+  #   networks:
+  #     - backend
+
+  # electrumx:
+  #   image: lukechilds/electrumx:v1.8.7
+  #   container_name: electrumx
+  #   ports:
+  #     - 50002:50002
+  #     - 50004:50004
+  #     - 8000:8000
+  #   environment:
+  #     - COIN=BitcoinSegwit
+  #     - NET=regtest
+  #     - RPC_HOST=0.0.0.0
+  #     - DAEMON_URL=http://foo:qDDZdeQ5vw9XXFeVnXT4PZ--tGN2xNjjR4nrtyszZx0=@bitcoin-core:18443
+  #     - SSL_CERTFILE=cert.pem
+  #     - SSL_KEYFILE=key.pem
+  #   volumes:
+  #     - ./electrumx:/data
+  #   depends_on:
+  #     - bitcoin-core
+  #   networks:
+  #     - backend
+
+  dwn-server:
+    image: ghcr.io/tbd54566975/dwn-server:main
+    container_name: dwn-server
+    ports:
+      - 3000:3000
+    volumes:
+      - ./dwn-data:/dwn-server/data
+    networks:
+      - backend
+
+  netonomy-server:
+    build:
+      context: server
+      dockerfile: Dockerfile.local
+    container_name: netonomy-server
+    ports:
+      - 3300:3300
+    volumes:
+      - ./server:/usr/src/app
+    networks:
+      backend:
+
+  netonomy-pwa:
+    build:
+      context: ./next-app
+      dockerfile: Dockerfile
+    container_name: netonomy-pwa
+    ports:
+      - 4000:4000
+    volumes:
+      - ./next-app:/usr/src/app
+    networks:
+      backend:
+
+networks:
+  backend:

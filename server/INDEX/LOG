@@ -1,0 +1,5 @@
+2023/07/22-22:58:01.318726 ffffa37ef120 Recovering log #8
+2023/07/22-22:58:01.320564 ffffa37ef120 Level-0 table #10: started
+2023/07/22-22:58:01.331192 ffffa37ef120 Level-0 table #10: 6836 bytes OK
+2023/07/22-22:58:01.342114 ffffa37ef120 Delete type=0 #8
+2023/07/22-22:58:01.343031 ffffa37ef120 Delete type=3 #6

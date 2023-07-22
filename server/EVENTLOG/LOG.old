@@ -1,0 +1,5 @@
+2023/07/22-22:57:52.379892 ffff86fdf120 Recovering log #5
+2023/07/22-22:57:52.380847 ffff86fdf120 Level-0 table #7: started
+2023/07/22-22:57:52.383657 ffff86fdf120 Level-0 table #7: 1772 bytes OK
+2023/07/22-22:57:52.389964 ffff86fdf120 Delete type=0 #5
+2023/07/22-22:57:52.390844 ffff86fdf120 Delete type=3 #4

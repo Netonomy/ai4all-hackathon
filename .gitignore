@@ -1,0 +1,4 @@
+*.pem
+dwn-data/
+electrumx/
+.bitcoin/
