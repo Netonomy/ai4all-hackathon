@@ -27,7 +27,7 @@ const options = {
   },
   apis: glob
     .sync("**/*.js", { cwd: `${__dirname}/routes/api/` })
-    .map((filename) => "dist/app/routes/api/" + filename), // files containing annotations as above
+    .map((filename) => "dist/app/routes/api/" + filename),
 };
 
 const swaggerDocs = swaggerJsDoc(options);

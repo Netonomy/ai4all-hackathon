@@ -3,3 +3,8 @@ uploads/
 dist/
 .env.local*
 .dockerignore
+data/
+DATASTORE/
+EVENTLOG/
+INDEX/
+MESSAGESTORE/
