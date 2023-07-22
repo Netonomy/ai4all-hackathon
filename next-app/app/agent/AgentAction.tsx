@@ -60,7 +60,7 @@ export default function AgentAction({ action }: { action: AiAction }) {
           ) : (
             <div className="flex flex-col items-center gap-4">
               <div
-                className="cursor-pointer p-2 rounded-xl hover:ring-2 ring-black relative overflow-hidden"
+                className="cursor-pointer p-2 rounded-xl hover:ring-2 ring-black relative overflow-hidden ease-in"
                 onClick={() => {
                   if (action.toolResponse)
                     navigator.clipboard

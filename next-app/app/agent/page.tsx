@@ -1,7 +1,7 @@
 "use client";
 import AiChatTextArea from "@/components/AiChatTextArea";
 import PageContainer from "@/components/containers/PageContainer";
-import { CheckCircle } from "lucide-react";
+import { Bot, CheckCircle } from "lucide-react";
 import { Fragment, useState } from "react";
 import BackBtn from "@/components/BackBtn";
 import { Button } from "@/components/ui/button";
@@ -10,6 +10,7 @@ import KeyLogo from "@/components/KeyLogo";
 import { useAtom } from "jotai";
 import { loadingAtom } from "@/state/loadingAtom";
 import { Badge } from "@/components/ui/badge";
+import AvatarProfile from "@/components/AvatarProfile";
 
 interface HumanMessage {
   type: "human";
@@ -150,22 +151,35 @@ export default function AgentPage() {
               .map((message, i) => (
                 <Fragment key={i}>
                   {message.type === "human" && (
-                    <div
-                      className={`my-2 p-3 rounded-xl inline-block bg-blue-500 text-white ml-auto whitespace-pre-wrap`}
-                    >
-                      {message.message}
+                    <div className={` ml-auto flex gap-2 items-end`}>
+                      <div className="whitespace-pre-wrap bg-blue-500 text-white rounded-xl inline-block my-2 p-3">
+                        {message.message}
+                      </div>
+
+                      <div className="min-h-[35px] min-w-[35px] max-h-[35px] max-w-[35px] mb-3">
+                        <AvatarProfile />
+                      </div>
                     </div>
                   )}
                   {message.type === "ai" && (
-                    <div
-                      className={`my-2 p-3 rounded-2xl inline-block bg-slate-400 text-white mr-auto whitespace-pre-wrap`}
-                    >
-                      {message.message}
+                    <div className="mr-auto flex gap-2 items-end">
+                      <div className="min-h-[35px] min-w-[35px] max-h-[35px] max-w-[35px] mb-3">
+                        <Bot />
+                      </div>
+
+                      <div
+                        className={`my-2 p-3 rounded-2xl inline-block bg-slate-400 text-white mr-auto whitespace-pre-wrap`}
+                      >
+                        {message.message}
+                      </div>
                     </div>
                   )}
                   {message.type === "aiAction" && (
-                    <div className={`my-2  inline-block text-white mr-auto`}>
-                      <AgentAction action={message} />
+                    <div className="mr-auto flex gap-2 items-end">
+                      <div className="min-h-[35px] min-w-[35px] max-h-[35px] max-w-[35px] mb-3" />
+                      <div className={`my-2 inline-block text-white mr-auto`}>
+                        <AgentAction action={message} />
+                      </div>
                     </div>
                   )}
                 </Fragment>

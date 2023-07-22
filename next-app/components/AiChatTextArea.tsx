@@ -39,7 +39,7 @@ export default function AiChatTextArea(props: {
 
   return (
     <div className="flex items-center relative w-full bg-white dark:bg-black">
-      <Bot className="absolute left-3 bottom-3" />
+      {/* <Bot className="absolute left-3 bottom-3" /> */}
 
       <Textarea
         ref={textAreaRef}
@@ -51,7 +51,7 @@ export default function AiChatTextArea(props: {
         onKeyDown={handleKeyDown}
         value={props.input}
         placeholder="Chat with your ai agent..."
-        className="shadow-md min-h-[50px] max-h-[200px] pt-[12px] resize-none w-full text-md pr-[52px] pl-[45px]"
+        className="shadow-md min-h-[50px] max-h-[200px] pt-[12px] resize-none w-full text-md pr-[52px]"
         disabled={props.disabled}
       />
 
