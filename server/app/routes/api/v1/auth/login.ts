@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { authenticatedLndGrpc } from "lightning";
+import { authenticatedLndGrpc, getWalletInfo } from "lightning";
 import jwt from "jsonwebtoken";
 
 /**
@@ -13,7 +13,7 @@ import jwt from "jsonwebtoken";
  *           schema:
  *             type: object
  *             properties:
- *               password:
+ *               macaroon:
  *                 type: string
  *                 required: true
  *     responses:
@@ -26,12 +26,19 @@ export default Router({ mergeParams: true }).post(
   "/v1/auth/login",
   async (req, res) => {
     try {
-      const { password } = req.body;
+      const { macaroon } = req.body;
 
-      if (password === process.env.PASSWORD) {
+      const { lnd } = authenticatedLndGrpc({
+        macaroon: macaroon,
+        socket: process.env.LND_ENDPOINT,
+      });
+
+      const walletInfo = await getWalletInfo({ lnd });
+
+      if (walletInfo) {
         const token = jwt.sign(
           {
-            password,
+            macaroon,
           },
           process.env.TOKEN_SECRET!
         );
@@ -47,8 +54,7 @@ export default Router({ mergeParams: true }).post(
     } catch (err: any) {
       console.error(err);
       res.status(400).json({
-        status: "FAILED",
-        error: err.message,
+        message: "Failed to authenticate",
       });
     }
   }
