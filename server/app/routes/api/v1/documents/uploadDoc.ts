@@ -8,6 +8,8 @@ const upload = multer({ storage: multer.memoryStorage() });
  * @swagger
  * /api/v1/documents/uploadDoc:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       content:
  *         multipart/form-data:
@@ -26,7 +28,7 @@ const upload = multer({ storage: multer.memoryStorage() });
  */
 export default Router({ mergeParams: true }).post(
   "/v1/documents/uploadDoc",
-  //   authenticateToken,
+  authenticateToken,
   upload.single("file"),
   async (req, res) => {
     try {

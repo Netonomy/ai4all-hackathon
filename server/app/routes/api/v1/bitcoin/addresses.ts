@@ -8,6 +8,8 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  * /api/v1/bitcoin/addresses:
  *   get:
  *     description: A list of created on chain addresses
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: OK

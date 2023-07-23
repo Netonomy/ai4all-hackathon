@@ -7,6 +7,8 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  * @swagger
  * /api/v1/lightning/closeChannel:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

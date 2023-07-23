@@ -156,10 +156,10 @@ async function initResources() {
     agentType: "openai-functions",
     verbose: false,
     maxIterations: 10,
-    memory,
-    agentArgs: {
-      prefix,
-    },
+    // memory,
+    // agentArgs: {
+    //   prefix,
+    // },
   });
 }
 

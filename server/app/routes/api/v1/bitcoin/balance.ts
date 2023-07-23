@@ -7,6 +7,8 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  * @swagger
  * /api/v1/bitcoin/balance:
  *   get:
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: OK

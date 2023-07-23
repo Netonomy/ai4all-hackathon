@@ -11,6 +11,8 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  * @swagger
  * /api/v1/bitcoin/sendToAddress:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:

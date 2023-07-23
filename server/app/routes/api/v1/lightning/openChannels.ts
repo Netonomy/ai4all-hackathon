@@ -7,6 +7,8 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  * @swagger
  * /api/v1/lightning/openChannels:
  *   get:
+ *     security:
+ *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: OK
