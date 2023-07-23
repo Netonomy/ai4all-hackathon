@@ -6,11 +6,17 @@ import axiosInstance from "@/config/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
 
 export default function FinanceTotalItem() {
-  const balanceQuery = useQuery(["btc-balance"], async () => {
-    const res = await axiosInstance.get("v1/bitcoin/balance");
+  const balanceQuery = useQuery(
+    ["btc-balance"],
+    async () => {
+      const res = await axiosInstance.get("v1/bitcoin/balance");
 
-    return res.data;
-  });
+      return res.data;
+    },
+    {
+      refetchInterval: 5 * 60000,
+    }
+  );
 
   const [balance, setBalance] = useAtom(balanceAtom);
 

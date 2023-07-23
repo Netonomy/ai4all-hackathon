@@ -8,11 +8,16 @@ export default function TransactionsList() {
   const transactionsQuery = useQuery(["btc-transactions"], async () => {
     const res = await axiosInstance.get("v1/bitcoin/transactions");
 
-    return res.data;
+    return res.data.sort((a, b) => {
+      const date1 = new Date(a.created_at);
+      const date2 = new Date(b.created_at);
+
+      return date2.getTime() - date1.getTime();
+    });
   });
 
   return (
-    <div className="flex flex-col flex-1 p-2 items-center w-full overflow-y-auto ">
+    <div className="flex flex-col flex-1 items-center w-full overflow-y-auto">
       {transactionsQuery.isLoading ? (
         Array.from({ length: 3 }).map((_, i) => (
           <Skeleton
@@ -46,12 +51,13 @@ export default function TransactionsList() {
 
                   <p className="text-sm text-muted-foreground">
                     {timeStampToTimeAgo(
-                      new Date(transaction.created_at as string).getTime()
+                      new Date(transaction.created_at as string).getTime() /
+                        1000
                     )}
                   </p>
                 </div>
 
-                <div className="">
+                <div className="w-max">
                   <small
                     className={`text-sm font-medium leading-none ${
                       transaction.is_outgoing
@@ -59,7 +65,7 @@ export default function TransactionsList() {
                         : "text-[#AE2727]"
                     }`}
                   >
-                    {transaction.tokens}
+                    {transaction.tokens} sats
                   </small>
                 </div>
               </div>

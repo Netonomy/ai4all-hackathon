@@ -10,6 +10,7 @@ import { userDetailsAtom } from "@/state/user/userDetails";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { sideSheetOpenAtom } from "@/state/storage/sideSheetOpenAtom";
+import { tokenAtom } from "@/state/tokenAtom";
 
 export default function NavBar() {
   const [selectedBtn, setSelectedBtn] = useState(
@@ -18,6 +19,7 @@ export default function NavBar() {
   const [, setUserDetails] = useAtom(userDetailsAtom);
   const router = useRouter();
   const [, setSheetOpen] = useAtom(sideSheetOpenAtom);
+  const [, setToken] = useAtom(tokenAtom);
 
   const isLargeScreen = window.innerWidth > 1024;
 
@@ -100,6 +102,7 @@ export default function NavBar() {
               onClick={() => {
                 setUserDetails(null);
                 setSheetOpen(false);
+                setToken(null);
                 router.push("/welcome");
               }}
             >

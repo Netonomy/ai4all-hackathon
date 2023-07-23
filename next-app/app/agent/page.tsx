@@ -12,6 +12,15 @@ import { loadingAtom } from "@/state/loadingAtom";
 import { Badge } from "@/components/ui/badge";
 import AvatarProfile from "@/components/AvatarProfile";
 import { tokenAtom } from "@/state/tokenAtom";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useRouter } from "next/navigation";
 
 interface HumanMessage {
   type: "human";
@@ -36,8 +45,8 @@ type Message = HumanMessage | AiAction | AiMessage;
 export default function AgentPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [, setLoading] = useAtom(loadingAtom);
-  const [token] = useAtom(tokenAtom);
-
+  const [token, setToken] = useAtom(tokenAtom);
+  const router = useRouter();
   const [message, setMessage] = useState("");
 
   async function sendMessage() {
@@ -115,23 +124,42 @@ export default function AgentPage() {
   return (
     <PageContainer>
       <div className="absolute top-0 left-0 right-0 h-[80px] z-[100] backdrop-blur-xl bg-white/30 border-b-[1.5px]">
-        <div className="h-full w-full flex items-center justify-between p-6">
-          <div>
+        <div className="h-full w-full flex items-center p-6">
+          <div className="w-[20%]">
             <BackBtn />
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center justify-center gap-2 w-[60%]">
             <KeyLogo height={45} width={45} />
             {/* <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
               Netonomy
             </h3> */}
           </div>
 
-          <div>
+          <div className="flex items-center gap-2 w-[20%] justify-end">
             {messages.length > 0 && (
               <Badge onClick={() => setMessages([])} className="cursor-pointer">
                 Reset Chat
               </Badge>
             )}
+
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <div className="h-[40px] w-[40px]">
+                  <AvatarProfile />
+                </div>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="z-[110]">
+                {/* <DropdownMenuSeparator /> */}
+                <DropdownMenuItem
+                  onClick={() => {
+                    setToken(null);
+                    router.push("/welcome");
+                  }}
+                >
+                  Log Out
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       </div>

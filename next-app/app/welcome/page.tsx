@@ -1,5 +1,4 @@
 "use client";
-
 import KeyLogo from "@/components/KeyLogo";
 import PageContainer from "@/components/containers/PageContainer";
 import { Button } from "@/components/ui/button";
@@ -10,28 +9,37 @@ import axiosInstance from "@/config/axiosInstance";
 import { useAtom } from "jotai";
 import { tokenAtom } from "@/state/tokenAtom";
 import { useRouter } from "next/navigation";
+import { loadingAtom } from "@/state/loadingAtom";
 
 export default function Welcome() {
-  const [password, setPassword] = useState("");
+  const [macaroon, setMacaroon] = useState("");
   const [, setToken] = useAtom(tokenAtom);
   const router = useRouter();
+  const [error, setError] = useState(false);
+  const [loading, setLoading] = useAtom(loadingAtom);
 
   async function login() {
-    if (password === "") return "";
+    setLoading(true);
 
-    const res = await axiosInstance.post("v1/auth/login", {
-      password,
-    });
+    try {
+      const res = await axiosInstance.post("v1/auth/login", {
+        macaroon,
+      });
 
-    if (res.status === 200) {
-      const token = res.data.bearerToken;
-      setToken(token);
-      axiosInstance.defaults.headers.common[
-        "Authorization"
-      ] = `Bearer ${token}`;
+      if (res.status === 200) {
+        const token = res.data.bearerToken;
+        setToken(token);
+        axiosInstance.defaults.headers.common[
+          "Authorization"
+        ] = `Bearer ${token}`;
 
-      router.push("/home");
+        router.push("/home");
+      }
+    } catch (err) {
+      setError(err);
     }
+
+    setLoading(false);
   }
 
   return (
@@ -50,10 +58,15 @@ export default function Welcome() {
           </div>
 
           <Input
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Lightning Admin Macaroon"
+            value={macaroon}
+            onChange={(e) => setMacaroon(e.target.value)}
           />
+          {error && (
+            <small className="text-sm font-medium leading-none text-red-600">
+              Error loggin in
+            </small>
+          )}
         </div>
 
         <div className="flex flex-col items-center justify-center gap-4">
@@ -62,6 +75,7 @@ export default function Welcome() {
             onClick={async () => {
               login();
             }}
+            disabled={loading}
           >
             Login
           </Button>

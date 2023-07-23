@@ -14,7 +14,7 @@ export default function AgentAction({ action }: { action: AiAction }) {
   const [showCopiedMessage, setShowCopiedMessage] = useState(false);
 
   switch (action.tool) {
-    case "search" || "web-browser": {
+    case "search": {
       return (
         <Accordion
           type="single"
@@ -89,6 +89,41 @@ export default function AgentAction({ action }: { action: AiAction }) {
             </div>
           )}
         </>
+      );
+    }
+    case "web-browser": {
+      return (
+        <Accordion
+          type="single"
+          collapsible
+          className="rounded-xl bg-slate-900"
+        >
+          <AccordionItem value="item-1" className="border-b-0 ">
+            <AccordionTrigger className="p-2 hover:no-underline">
+              {action.inProgress ? (
+                <div className="mr-1 flex items-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Searching the web
+                </div>
+              ) : (
+                <div className="mr-1 flex items-center">Finished Search</div>
+              )}
+            </AccordionTrigger>
+            <AccordionContent className="pl-2 pr-2 ml-6 mr-2">
+              <div className="flex items-center gap-2">
+                <div className="font-semibold">Search Input:</div>
+                {action.toolInput}
+              </div>
+
+              {action.toolResponse && (
+                <div className="mt-4 flex items-start gap-2 h-auto justify-start">
+                  <div className="font-semibold flex flex-1 w-18">Results:</div>
+                  {action.toolResponse}
+                </div>
+              )}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
       );
     }
     default: {
