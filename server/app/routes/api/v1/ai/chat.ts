@@ -1,12 +1,15 @@
 import { Router } from "express";
 import { HumanMessage, AIMessage } from "langchain/schema";
 import { agentExecutor, dwn } from "../../../../config/web5AndAgentExecutor.js";
+import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
  * /api/v1/ai/chat:
  *   post:
  *     description: Chat with your AI Agent
+ *     security:
+ *       - bearerAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -36,6 +39,7 @@ import { agentExecutor, dwn } from "../../../../config/web5AndAgentExecutor.js";
  */
 export default Router({ mergeParams: true }).post(
   "/v1/ai/chat",
+  authenticateToken,
   async (req, res) => {
     try {
       const { input } = req.body;

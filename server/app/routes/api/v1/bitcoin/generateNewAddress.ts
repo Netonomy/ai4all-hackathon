@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { createChainAddress, getChainBalance } from "lightning";
 import { lnd } from "../../../../config/lndClient.js";
+import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
@@ -25,6 +26,7 @@ import { lnd } from "../../../../config/lndClient.js";
  */
 export default Router({ mergeParams: true }).post(
   "/v1/bitcoin/generateNewAddress",
+  authenticateToken,
   async (req, res) => {
     try {
       const format = "p2wpkh";

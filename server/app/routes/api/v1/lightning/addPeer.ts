@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { addPeer, closeChannel, getChainBalance, getChannels } from "lightning";
 import { lnd } from "../../../../config/lndClient.js";
+import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
@@ -27,6 +28,7 @@ import { lnd } from "../../../../config/lndClient.js";
  */
 export default Router({ mergeParams: true }).post(
   "/v1/lightning/addPeer",
+  authenticateToken,
   async (req, res) => {
     try {
       const { publicKey, socket } = req.body;

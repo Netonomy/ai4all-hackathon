@@ -24,6 +24,15 @@ const options = {
       version: "0.0.1",
       description: "Be your own Server.",
     },
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
   },
   apis: glob
     .sync("**/*.js", { cwd: `${__dirname}/routes/api/` })

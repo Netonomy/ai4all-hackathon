@@ -1,11 +1,10 @@
 import { Router } from "express";
-import { closeChannel, getChainBalance, getChannels } from "lightning";
-import { lnd } from "../../../../config/lndClient.js";
-import { authenticateToken } from "../../../../middleware/auth.middleware.js";
+import { authenticatedLndGrpc } from "lightning";
+import jwt from "jsonwebtoken";
 
 /**
  * @swagger
- * /api/v1/lightning/closeChannel:
+ * /api/v1/auth/login:
  *   post:
  *     requestBody:
  *       required: true
@@ -14,24 +13,37 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  *           schema:
  *             type: object
  *             properties:
- *               id:
+ *               password:
  *                 type: string
  *                 required: true
  *     responses:
  *       200:
  *         description: OK
  *     tags:
- *       - lightning
+ *       - auth
  */
 export default Router({ mergeParams: true }).post(
-  "/v1/lightning/closeChannel",
-  authenticateToken,
+  "/v1/auth/login",
   async (req, res) => {
     try {
-      const { id } = req.body;
-      const response = await closeChannel({ id, lnd });
+      const { password } = req.body;
 
-      res.json(response);
+      if (password === process.env.PASSWORD) {
+        const token = jwt.sign(
+          {
+            password,
+          },
+          process.env.TOKEN_SECRET!
+        );
+
+        res.json({
+          bearerToken: token,
+        });
+      } else {
+        res.status(400).json({
+          message: "Failed to authenticate",
+        });
+      }
     } catch (err: any) {
       console.error(err);
       res.status(400).json({

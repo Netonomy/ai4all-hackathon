@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getPeers } from "lightning";
 import { lnd } from "../../../../config/lndClient.js";
+import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
@@ -14,6 +15,7 @@ import { lnd } from "../../../../config/lndClient.js";
  */
 export default Router({ mergeParams: true }).get(
   "/v1/lightning/peers",
+  authenticateToken,
   async (req, res) => {
     try {
       const peers = (await getPeers({ lnd })).peers;

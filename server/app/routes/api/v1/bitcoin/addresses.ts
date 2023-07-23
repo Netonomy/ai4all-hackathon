@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getChainAddresses } from "lightning";
 import { lnd } from "../../../../config/lndClient.js";
+import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
@@ -26,6 +27,7 @@ import { lnd } from "../../../../config/lndClient.js";
  */
 export default Router({ mergeParams: true }).get(
   "/v1/bitcoin/addresses",
+  authenticateToken,
   async (req, res) => {
     try {
       const addresses = (await getChainAddresses({ lnd })).addresses;

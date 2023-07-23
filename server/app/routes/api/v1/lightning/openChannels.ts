@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getChainBalance, getChannels } from "lightning";
 import { lnd } from "../../../../config/lndClient.js";
+import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
@@ -25,6 +26,7 @@ import { lnd } from "../../../../config/lndClient.js";
  */
 export default Router({ mergeParams: true }).get(
   "/v1/lightning/openChannels",
+  authenticateToken,
   async (req, res) => {
     try {
       const channels = (await getChannels({ lnd })).channels;

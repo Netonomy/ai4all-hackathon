@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { getChainBalance } from "lightning";
 import { lnd } from "../../../../config/lndClient.js";
+import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
@@ -25,6 +26,7 @@ import { lnd } from "../../../../config/lndClient.js";
  */
 export default Router({ mergeParams: true }).get(
   "/v1/bitcoin/balance",
+  authenticateToken,
   async (req, res) => {
     try {
       const balance = (await getChainBalance({ lnd })).chain_balance;

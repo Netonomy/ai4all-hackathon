@@ -60,7 +60,7 @@ async function initResources() {
     new DynamicTool({
       name: "bitcoin-address-generator",
       description:
-        "call this function to generate a new on chain bitcoin address to recieve funds. The input is a empty string.",
+        "call this function to generate a new on chain bitcoin address to recieve bitcoin. The input is a empty string.",
       func: async () => {
         const format = "p2wpkh";
         const address = (await createChainAddress({ lnd, format })).address;
@@ -69,16 +69,22 @@ async function initResources() {
       },
     }),
   ];
+
   const chat = new ChatOpenAI({
     modelName: "gpt-3.5-turbo-0613",
     temperature: 0,
   });
 
+  const prefix =
+    "You are a Personal AI Agent. You live in an application called Netonomy. Its an open source application that makes every person their own server. You have access to tools like the users bitcoin wallet and searching the internet. Help the user as best you can.";
   agentExecutor = await initializeAgentExecutorWithOptions(tools, chat, {
     agentType: "openai-functions",
     verbose: false,
     maxIterations: 10,
     memory,
+    agentArgs: {
+      prefix,
+    },
   });
 }
 

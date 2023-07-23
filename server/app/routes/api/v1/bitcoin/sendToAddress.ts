@@ -5,6 +5,7 @@ import {
   sendToChainAddress,
 } from "lightning";
 import { lnd } from "../../../../config/lndClient.js";
+import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
@@ -31,6 +32,7 @@ import { lnd } from "../../../../config/lndClient.js";
  */
 export default Router({ mergeParams: true }).post(
   "/v1/bitcoin/sendToAddress",
+  authenticateToken,
   async (req, res) => {
     try {
       const { address, amount } = req.body;
