@@ -5,7 +5,12 @@ import {
   initializeAgentExecutorWithOptions,
 } from "langchain/agents";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { DynamicTool, SerpAPI, ChainTool } from "langchain/tools";
+import {
+  DynamicTool,
+  SerpAPI,
+  ChainTool,
+  DynamicStructuredTool,
+} from "langchain/tools";
 import { Calculator } from "langchain/tools/calculator";
 import { createChainAddress } from "lightning";
 import { lnd } from "./lndClient.js";
@@ -21,6 +26,8 @@ import { TextLoader } from "langchain/document_loaders/fs/text";
 import { HNSWLib } from "langchain/vectorstores/hnswlib";
 import { DocxLoader } from "langchain/document_loaders/fs/docx";
 import { WebBrowser } from "langchain/tools/webbrowser";
+import { z } from "zod";
+import { DateSort } from "@tbd54566975/dwn-sdk-js";
 
 // global scope (outside of the route)
 let dwn: DwnApi;
@@ -40,6 +47,7 @@ async function initResources() {
       filter: {
         schema: "https://langchain.com/chatMessage",
       },
+      dateSort: DateSort.CreatedAscending,
     },
   });
 
@@ -143,10 +151,62 @@ async function initResources() {
       },
     }),
     new WebBrowser({ model, embeddings }),
+    new DynamicStructuredTool({
+      name: "decentralized-web-node-storer",
+      description:
+        "stores data to a users decentralized web node. Useful when you need to save information.",
+      schema: z.object({
+        schema: z
+          .string()
+          .describe("The URI of a schema that reprensets the data structure"),
+        data: z
+          .any()
+          .describe(
+            "The data to store in the web node. Make this a JSON object."
+          ),
+      }),
+      func: async ({ schema, data }) => {
+        const res = await web5.dwn.records.create({
+          data: data,
+          message: {
+            schema: schema,
+          },
+        });
+
+        return JSON.stringify(res.status);
+      },
+    }),
+    new DynamicStructuredTool({
+      name: "decentralized-web-node-fetcher",
+      description:
+        "fetches data from a users decentralized web node. Useful when you need to get some information.",
+      schema: z.object({
+        schema: z
+          .string()
+          .describe("The URI of a schema that reprensets the data structure"),
+      }),
+      func: async ({ schema }) => {
+        const { records = [] } = await web5.dwn.records.query({
+          message: {
+            filter: {
+              schema,
+            },
+          },
+        });
+
+        let data = [];
+        for (const record of records) {
+          const d = await record.data.json();
+          data.push(d);
+        }
+
+        return JSON.stringify(data);
+      },
+    }),
   ];
 
   const chat = new ChatOpenAI({
-    modelName: "gpt-4-0613",
+    modelName: "gpt-3.5-turbo-0613",
     temperature: 0,
   });
 
