@@ -48,7 +48,7 @@ export default Router({ mergeParams: true }).post(
       const data = {
         "@context": "https://schema.org",
         "@type": "DigitalDocument",
-        name: req.file.filename,
+        name: req.file.originalname,
         encodingFormat: req.file.mimetype,
         size: req.file.size.toString(),
         datePublished: new Date().toISOString(),

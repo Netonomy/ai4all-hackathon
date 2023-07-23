@@ -5,7 +5,7 @@ import {
   initializeAgentExecutorWithOptions,
 } from "langchain/agents";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { DynamicTool, SerpAPI } from "langchain/tools";
+import { DynamicTool, SerpAPI, ChainTool } from "langchain/tools";
 import { Calculator } from "langchain/tools/calculator";
 import { createChainAddress } from "lightning";
 import { lnd } from "./lndClient.js";
@@ -15,6 +15,12 @@ import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { Document } from "langchain/dist/document.js";
+import { VectorDBQAChain } from "langchain/chains";
+import { OpenAI } from "langchain/llms/openai";
+import { TextLoader } from "langchain/document_loaders/fs/text";
+import { HNSWLib } from "langchain/vectorstores/hnswlib";
+import { DocxLoader } from "langchain/document_loaders/fs/docx";
+import { WebBrowser } from "langchain/tools/webbrowser";
 
 // global scope (outside of the route)
 let dwn: DwnApi;
@@ -66,27 +72,61 @@ async function initResources() {
   //   },
   // });
 
-  // console.log(filesRes);
+  // let docs: Document<Record<string, any>>[] = [];
 
   // if (filesRes.records) {
-  // const blobs = await Promise.all(
-  //   filesRes.records.map(async (record) => {
-  //     const blob = await record.data.blob();
-  //     return blob;
+  //   for (const record of filesRes.records) {
+  //     const file = await record.data.json();
+  //     const blobRecordId = file.blobRecordId;
+
+  //     const blobRes = await web5.dwn.records.read({
+  //       message: {
+  //         recordId: blobRecordId,
+  //       },
+  //     });
+
+  //     if (blobRes.record) {
+  //       const blob = await blobRes.record.data.blob();
+
+  //       console.log(blob.type);
+
+  //       let loader;
+  //       if (blob.type === "application/pdf") {
+  //         // loader = new PDFLoader(blob);
+  //       } else if (blob.type === "text/plain") {
+  //         // loader = new TextLoader(blob);
+  //       } else if (
+  //         blob.type ===
+  //         "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+  //       ) {
+  //         loader = new DocxLoader(blob);
+  //       }
+  //       if (loader) {
+  //         const result = await loader.load();
+  //         docs = docs.concat(result);
+  //       }
+  //     }
+  //   }
+  // }
+
+  // Load the docs into the vector store
+  // const vectorStore = await HNSWLib.fromDocuments(
+  //   docs,
+  //   new OpenAIEmbeddings({
+  //     modelName: "text-embedding-ada-002",
   //   })
   // );
-  // let docs: Document<Record<string, any>>[] = [];
-  // for (const blob of blobs) {
-  //   const loader = new PDFLoader(blob);
-  //   const result = await loader.load();
-  //   docs = docs.concat(result);
-  // }
-  // // Load the docs into the vector store
-  // const vectorStore = await MemoryVectorStore.fromDocuments(
-  //   docs,
-  //   new OpenAIEmbeddings()
-  // );
-  // }
+  // const model = new OpenAI({ temperature: 0, modelName: "gpt-3.5-turbo-16k" });
+  // const chain = VectorDBQAChain.fromLLM(model, vectorStore);
+  // const qaTool = new ChainTool({
+  //   name: "files-qa",
+  //   description:
+  //     "Ideal for querying and navigating through large volumes of documents using conversational interactions. Call this function when you need access to the users information in their documents.",
+  //   chain: chain,
+  // });
+
+  const model = new OpenAI({ temperature: 0, modelName: "gpt-3.5-turbo-16k" });
+  const embeddings = new OpenAIEmbeddings();
 
   const tools = [
     new Calculator(),
@@ -102,15 +142,16 @@ async function initResources() {
         return address;
       },
     }),
+    new WebBrowser({ model, embeddings }),
   ];
 
   const chat = new ChatOpenAI({
-    modelName: "gpt-3.5-turbo-0613",
+    modelName: "gpt-4-0613",
     temperature: 0,
   });
 
   const prefix =
-    "You are a Personal AI Agent. You live in an application called Netonomy. Its an open source application that makes every person their own server. You have access to tools like the users bitcoin wallet and searching the internet. Help the user as best you can.";
+    "You are a personal AI Agent for a single user. Your goal is to help them as best you can and accomplish what they want you to. You have access to their personal information and bitcoin finances.";
   agentExecutor = await initializeAgentExecutorWithOptions(tools, chat, {
     agentType: "openai-functions",
     verbose: false,
