@@ -1,6 +1,6 @@
 "use client";
 import FinanceRequestAndPayButtons from "@/components/FinanceRequestAndPayButtons";
-import FinanceTotalItem from "@/components/FinanceTotalItem";
+import FinanceTotalItem from "@/app/finances/FinanceTotalItem";
 import TransactionsList from "@/components/TransactionsList";
 import { Card, CardContent } from "@/components/ui/card";
 import {

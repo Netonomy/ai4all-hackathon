@@ -11,6 +11,7 @@ import { useAtom } from "jotai";
 import { loadingAtom } from "@/state/loadingAtom";
 import { Badge } from "@/components/ui/badge";
 import AvatarProfile from "@/components/AvatarProfile";
+import { tokenAtom } from "@/state/tokenAtom";
 
 interface HumanMessage {
   type: "human";
@@ -35,6 +36,7 @@ type Message = HumanMessage | AiAction | AiMessage;
 export default function AgentPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [, setLoading] = useAtom(loadingAtom);
+  const [token] = useAtom(tokenAtom);
 
   const [message, setMessage] = useState("");
 
@@ -53,9 +55,12 @@ export default function AgentPage() {
     ]);
     setMessage("");
 
-    fetch("http://localhost:3300/api/v1/ai/chat", {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL2}/v1/ai/chat`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
       body: JSON.stringify({
         input: message,
       }),

@@ -1,36 +1,19 @@
-"use client";
-import useWeb5 from "@/hooks/useWeb5";
-import TransactionDetails, {
-  TransactionType,
-} from "@/types/TransactionDetails";
 import Image from "next/image";
-import { useEffect, useState } from "react";
 import { Skeleton } from "./ui/skeleton";
-import { useAtom } from "jotai";
-import { transactionsAtom } from "@/state/finance/transactionsAtom";
 import { timeStampToTimeAgo } from "@/utils/timestampToTimeAgo";
+import { useQuery } from "@tanstack/react-query";
+import axiosInstance from "@/config/axiosInstance";
 
 export default function TransactionsList() {
-  const { btcWallet } = useWeb5();
-  const [transactions, setTransactions] = useAtom(transactionsAtom);
+  const transactionsQuery = useQuery(["btc-transactions"], async () => {
+    const res = await axiosInstance.get("v1/bitcoin/transactions");
 
-  async function fetchTransactions() {
-    const transactions = await btcWallet?.getWalletTransactionsWithDetails();
-    if (transactions)
-      setTransactions(transactions.sort((a, b) => b.time - a.time));
-  }
-
-  useEffect(() => {
-    fetchTransactions();
-
-    const intervalId = setInterval(fetchTransactions, 5 * 60 * 1000); // fetch every 5 minutes
-
-    return () => clearInterval(intervalId); // clear interval on component unmount
-  }, [btcWallet]);
+    return res.data;
+  });
 
   return (
     <div className="flex flex-col flex-1 p-2 items-center w-full overflow-y-auto ">
-      {!transactions ? (
+      {transactionsQuery.isLoading ? (
         Array.from({ length: 3 }).map((_, i) => (
           <Skeleton
             key={i}
@@ -39,45 +22,44 @@ export default function TransactionsList() {
         ))
       ) : (
         <>
-          {transactions && transactions.length > 0 ? (
-            transactions.map((transaction) => (
+          {transactionsQuery.data && transactionsQuery.data.length > 0 ? (
+            transactionsQuery.data.map((transaction) => (
               <div
                 className="w-full h-12 min-h-[48px] lg:min-h-[55px] rounded-lg p-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-[#1d1d1d] cursor-pointer"
-                key={transaction.hash}
+                key={transaction.transaction}
                 onClick={(e) => {
                   e.stopPropagation();
                 }}
               >
                 <div className="relative h-7 w-7 lg:h-10 lg:w-10">
-                  {transaction.type === TransactionType.withdraw && (
-                    <Image src={"/withdrawIcon.svg"} alt="withdraw" fill />
-                  )}
-                  {transaction.type === TransactionType.deposit && (
+                  {transaction.is_outgoing ? (
                     <Image src={"/depositIcon.svg"} alt="deposit" fill />
+                  ) : (
+                    <Image src={"/withdrawIcon.svg"} alt="withdraw" fill />
                   )}
                 </div>
 
                 <div className="flex flex-1 flex-col h-auto justify-center">
                   <p className="max-w-[300px] truncate">
-                    {transaction.type === TransactionType.deposit
-                      ? transaction.fromAddresses![0]
-                      : transaction.toAddresses![0]}
+                    {transaction.output_addresses[0]}
                   </p>
 
                   <p className="text-sm text-muted-foreground">
-                    {timeStampToTimeAgo(transaction.time)}
+                    {timeStampToTimeAgo(
+                      new Date(transaction.created_at as string).getTime()
+                    )}
                   </p>
                 </div>
 
                 <div className="">
                   <small
                     className={`text-sm font-medium leading-none ${
-                      transaction.type === TransactionType.deposit
+                      transaction.is_outgoing
                         ? "text-[#27AE60]"
                         : "text-[#AE2727]"
                     }`}
                   >
-                    {transaction.amount}
+                    {transaction.tokens}
                   </small>
                 </div>
               </div>

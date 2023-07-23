@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider";
 import TopLoader from "@/components/TopLoader";
+import Providers from "./providers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -48,10 +49,12 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} overflow-hidden`}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <TopLoader />
-          {children}
-        </ThemeProvider>
+        <Providers>
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+            <TopLoader />
+            {children}
+          </ThemeProvider>
+        </Providers>
       </body>
     </html>
   );

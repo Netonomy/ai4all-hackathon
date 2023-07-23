@@ -1,5 +1,6 @@
 "use client";
 
+import { tokenAtom } from "@/state/tokenAtom";
 import { userDetailsAtom } from "@/state/user/userDetails";
 import { useAtom } from "jotai";
 import { useRouter } from "next/navigation";
@@ -12,7 +13,8 @@ interface PrivateRouteProps {
 export default function PrivateRoute(props: PrivateRouteProps) {
   const router = useRouter();
   const [isBrowser, setIsBrowser] = React.useState(false);
-  const [userDetails] = useAtom(userDetailsAtom);
+  // const [userDetails] = useAtom(userDetailsAtom);
+  const [token] = useAtom(tokenAtom);
 
   useEffect(() => {
     setIsBrowser(typeof window !== "undefined");
@@ -20,11 +22,11 @@ export default function PrivateRoute(props: PrivateRouteProps) {
 
   useEffect(() => {
     if (isBrowser) {
-      if (!userDetails) {
+      if (!token) {
         router.push("/welcome");
       }
     }
-  }, [isBrowser, userDetails]);
+  }, [isBrowser, token]);
 
   if (!isBrowser) return <></>;
 

@@ -14,7 +14,7 @@ export default function AgentAction({ action }: { action: AiAction }) {
   const [showCopiedMessage, setShowCopiedMessage] = useState(false);
 
   switch (action.tool) {
-    case "search": {
+    case "search" || "web-browser": {
       return (
         <Accordion
           type="single"

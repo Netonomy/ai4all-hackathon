@@ -18,15 +18,12 @@ export default function LoginButton() {
     <Button
       className="w-80"
       onClick={async () => {
-        setLoading(true);
-
-        if (did) {
-          setUserDetails({ did: did });
-
-          router.push("/home");
-
-          setLoading(false);
-        }
+        // setLoading(true);
+        // if (did) {
+        //   setUserDetails({ did: did });
+        //   router.push("/home");
+        //   setLoading(false);
+        // }
       }}
     >
       Login

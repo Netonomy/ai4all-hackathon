@@ -1,20 +1,24 @@
-"use client";
-import useWeb5 from "@/hooks/useWeb5";
 import { balanceAtom } from "@/state/finance/balanceAtom";
 import { useAtom } from "jotai";
 import { useEffect } from "react";
-import { Skeleton } from "./ui/skeleton";
+import { Skeleton } from "../../components/ui/skeleton";
+import axiosInstance from "@/config/axiosInstance";
+import { useQuery } from "@tanstack/react-query";
 
 export default function FinanceTotalItem() {
-  const { btcWallet } = useWeb5();
+  const balanceQuery = useQuery(["btc-balance"], async () => {
+    const res = await axiosInstance.get("v1/bitcoin/balance");
+
+    return res.data;
+  });
 
   const [balance, setBalance] = useAtom(balanceAtom);
 
-  async function getBalance() {
-    let balance = await btcWallet?.getWalletBalance();
+  async function formatBalance() {
+    let balance = balanceQuery.data;
 
     if (balance) {
-      const satsString = balance.confirmed.toString().padStart(9, "0");
+      const satsString = balance.toString().padStart(9, "0");
       const formatted =
         satsString.slice(0, -8) +
         "." +
@@ -49,12 +53,12 @@ export default function FinanceTotalItem() {
   }
 
   useEffect(() => {
-    getBalance();
-  }, [btcWallet]);
+    if (balanceQuery.data) formatBalance();
+  }, [balanceQuery.isLoading]);
 
   return (
     <>
-      {balance ? (
+      {!balanceQuery.isLoading ? (
         <div className="rounded-lg bg-[#F1F5F9] dark:bg-[#1d1d1d] h-9 min-h-[32px] w-full flex items-center justify-between p-2 lg:h-11">
           <p className="text-sm text-muted-foreground lg:text-base">Total</p>
 

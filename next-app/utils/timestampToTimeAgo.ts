@@ -27,3 +27,11 @@ export function timeStampToTimeAgo(unixTimestamp: number): string {
 
   return difference;
 }
+
+export function dateToTimeAgo(timestamp: string): string {
+  const unixTimestamp = new Date(timestamp).getTime();
+
+  const timeAgo = timeStampToTimeAgo(unixTimestamp);
+
+  return timeAgo;
+}
