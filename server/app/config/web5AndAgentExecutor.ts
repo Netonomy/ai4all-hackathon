@@ -5,7 +5,7 @@ import {
   initializeAgentExecutorWithOptions,
 } from "langchain/agents";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import { DynamicTool, SerpAPI } from "langchain/tools";
+import { ChainTool, DynamicTool, SerpAPI, Tool } from "langchain/tools";
 import { Calculator } from "langchain/tools/calculator";
 import { createChainAddress } from "lightning";
 import { lnd } from "./lndClient.js";
@@ -15,10 +15,14 @@ import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
 import { Document } from "langchain/dist/document.js";
+import { BabyAGI } from "langchain/experimental/babyagi";
+import { OpenAI } from "langchain/llms/openai";
+import { PromptTemplate } from "langchain/prompts";
+import { LLMChain } from "langchain/chains";
 
 // global scope (outside of the route)
 let dwn: DwnApi;
-let agentExecutor: AgentExecutor;
+let babyAGI: BabyAGI;
 
 // Initialize these resources when your server starts
 async function initResources() {
@@ -88,37 +92,46 @@ async function initResources() {
   // );
   // }
 
-  const tools = [
-    new Calculator(),
-    new SerpAPI(),
-    new DynamicTool({
-      name: "bitcoin-address-generator",
-      description:
-        "call this function to generate a new on chain bitcoin address to recieve bitcoin. The input is a empty string.",
-      func: async () => {
-        const format = "p2wpkh";
-        const address = (await createChainAddress({ lnd, format })).address;
-
-        return address;
-      },
+  // First, we create a custom agent which will serve as execution chain.
+  const todoPrompt = PromptTemplate.fromTemplate(
+    "You are a planner who is an expert at coming up with a todo list for a given objective. Come up with a todo list for this objective: {objective}"
+  );
+  const tools: Tool[] = [
+    new SerpAPI(process.env.SERPAPI_API_KEY, {
+      location: "San Francisco,California,United States",
+      hl: "en",
+      gl: "us",
     }),
+    // new ChainTool({
+    //   name: "TODO",
+    //   chain: new LLMChain({
+    //     llm: new OpenAI({ temperature: 0 }),
+    //     prompt: todoPrompt,
+    //   }),
+    //   description:
+    //     "useful for when you need to come up with todo lists. Input: an objective to create a todo list for. Output: a todo list for that objective. Please be very clear what the objective is!",
+    // }),
   ];
+  const agentExecutor = await initializeAgentExecutorWithOptions(
+    tools,
+    new OpenAI({ temperature: 0, modelName: "gpt-4-0613" }),
+    {
+      agentType: "zero-shot-react-description",
+      agentArgs: {
+        prefix: `You are an AI who performs one task based on the following objective: {objective}. Take into account these previously completed tasks: {context}.`,
+        suffix: `Question: {task}
+{agent_scratchpad}`,
+        inputVariables: ["objective", "task", "context", "agent_scratchpad"],
+      },
+    }
+  );
 
-  const chat = new ChatOpenAI({
-    modelName: "gpt-3.5-turbo-0613",
-    temperature: 0,
-  });
+  const vectorStore = new MemoryVectorStore(new OpenAIEmbeddings());
 
-  const prefix =
-    "You are a Personal AI Agent. You live in an application called Netonomy. Its an open source application that makes every person their own server. You have access to tools like the users bitcoin wallet and searching the internet. Help the user as best you can.";
-  agentExecutor = await initializeAgentExecutorWithOptions(tools, chat, {
-    agentType: "openai-functions",
-    verbose: false,
-    maxIterations: 10,
-    memory,
-    agentArgs: {
-      prefix,
-    },
+  babyAGI = BabyAGI.fromLLM({
+    llm: new OpenAI({ temperature: 0, modelName: "gpt-3.5-turbo" }),
+    vectorstore: vectorStore,
+    maxIterations: 3,
   });
 }
 
@@ -127,4 +140,4 @@ initResources().catch((err) => {
   console.error("Failed to initialize resources:", err);
 });
 
-export { dwn, agentExecutor };
+export { dwn, babyAGI };
