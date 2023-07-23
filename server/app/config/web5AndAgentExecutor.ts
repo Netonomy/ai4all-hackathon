@@ -11,6 +11,10 @@ import { createChainAddress } from "lightning";
 import { lnd } from "./lndClient.js";
 import { HumanMessage, AIMessage } from "langchain/schema";
 import { BufferMemory, ChatMessageHistory } from "langchain/memory";
+import { PDFLoader } from "langchain/document_loaders/fs/pdf";
+import { MemoryVectorStore } from "langchain/vectorstores/memory";
+import { OpenAIEmbeddings } from "langchain/embeddings/openai";
+import { Document } from "langchain/dist/document.js";
 
 // global scope (outside of the route)
 let dwn: DwnApi;
@@ -53,6 +57,36 @@ async function initResources() {
     inputKey: "input",
     outputKey: "output",
   });
+
+  // const filesRes = await web5.dwn.records.query({
+  //   message: {
+  //     filter: {
+  //       schema: "https://schema.org/DigitalDocument",
+  //     },
+  //   },
+  // });
+
+  // console.log(filesRes);
+
+  // if (filesRes.records) {
+  // const blobs = await Promise.all(
+  //   filesRes.records.map(async (record) => {
+  //     const blob = await record.data.blob();
+  //     return blob;
+  //   })
+  // );
+  // let docs: Document<Record<string, any>>[] = [];
+  // for (const blob of blobs) {
+  //   const loader = new PDFLoader(blob);
+  //   const result = await loader.load();
+  //   docs = docs.concat(result);
+  // }
+  // // Load the docs into the vector store
+  // const vectorStore = await MemoryVectorStore.fromDocuments(
+  //   docs,
+  //   new OpenAIEmbeddings()
+  // );
+  // }
 
   const tools = [
     new Calculator(),
