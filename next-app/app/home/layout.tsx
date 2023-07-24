@@ -1,5 +1,6 @@
 import PageContainer from "@/components/containers/PageContainer";
 import PrivateRoute from "@/components/PrivateRoute";
+import Header from "../header";
 
 export default function HomeLayout({
   children,
@@ -8,7 +9,10 @@ export default function HomeLayout({
 }) {
   return (
     <PrivateRoute>
-      <PageContainer>{children}</PageContainer>
+      <PageContainer>
+        <Header />
+        {children}
+      </PageContainer>
     </PrivateRoute>
   );
 }

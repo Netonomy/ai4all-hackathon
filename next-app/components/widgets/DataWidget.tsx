@@ -8,15 +8,12 @@ export default function DataWidget() {
   const router = useRouter();
   return (
     <Card
-      className="w-full h-full z-0 cursor-pointer"
+      className="w-full  z-0 cursor-pointer rounded-2xl"
       onClick={(e) => {
         router.push("data");
       }}
     >
-      <CardHeader className=" flex pt-4 pl-4">
-        <CardTitle>Data</CardTitle>
-      </CardHeader>
-      <CardContent className="flex h-[90%] flex-col w-full overflow-y-auto">
+      <CardContent className="flex  flex-col w-full overflow-y-auto">
         <FilesList searchText="" />
       </CardContent>
     </Card>

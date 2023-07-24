@@ -18,11 +18,11 @@ export const metadata: Metadata = {
     userScalable: false,
     viewportFit: "cover",
   },
-  applicationName: "Netonomy Wallet",
+  applicationName: "Netonomy",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Netonomy Wallet",
+    title: "Netonomy",
     startupImage: "/splash.png",
   },
   formatDetection: {

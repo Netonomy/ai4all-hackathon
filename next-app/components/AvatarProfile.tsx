@@ -8,7 +8,7 @@ export default function AvatarProfile() {
   const { profile } = useProfile();
   return (
     <Avatar className="h-full w-full">
-      {profile?.image && <AvatarImage src={profile.image} />}
+      {profile?.picture && <AvatarImage src={profile.picture} />}
       <AvatarFallback>
         <Skeleton className="h-full w-full rounded-full" />
       </AvatarFallback>

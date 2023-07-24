@@ -45,7 +45,7 @@ export default function TransactionsList() {
                 </div>
 
                 <div className="flex flex-1 flex-col h-auto justify-center">
-                  <p className="max-w-[300px] truncate">
+                  <p className="max-w-[225px] truncate">
                     {transaction.output_addresses[0]}
                   </p>
 

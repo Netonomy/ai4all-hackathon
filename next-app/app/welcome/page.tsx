@@ -2,14 +2,24 @@
 import KeyLogo from "@/components/KeyLogo";
 import PageContainer from "@/components/containers/PageContainer";
 import { Button } from "@/components/ui/button";
-import LoginButton from "./LoginButton";
-import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import axiosInstance from "@/config/axiosInstance";
 import { useAtom } from "jotai";
 import { tokenAtom } from "@/state/tokenAtom";
 import { useRouter } from "next/navigation";
 import { loadingAtom } from "@/state/loadingAtom";
+import Link from "next/link";
+import useLogin from "@/react-query/useLoginMutation";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { getPublicKey } from "nostr-tools";
+import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
 
 export default function Welcome() {
   const [macaroon, setMacaroon] = useState("");
@@ -17,30 +27,11 @@ export default function Welcome() {
   const router = useRouter();
   const [error, setError] = useState(false);
   const [loading, setLoading] = useAtom(loadingAtom);
+  const [, setPrivateKey] = useAtom(privateKeyHexAtom);
 
-  async function login() {
-    setLoading(true);
+  const [showLoginDialog, setShowLoginDialog] = useState(false);
 
-    try {
-      const res = await axiosInstance.post("v1/auth/login", {
-        macaroon,
-      });
-
-      if (res.status === 200) {
-        const token = res.data.bearerToken;
-        setToken(token);
-        axiosInstance.defaults.headers.common[
-          "Authorization"
-        ] = `Bearer ${token}`;
-
-        router.push("/home");
-      }
-    } catch (err) {
-      setError(err);
-    }
-
-    setLoading(false);
-  }
+  const login = useLogin();
 
   return (
     <PageContainer>
@@ -49,44 +40,119 @@ export default function Welcome() {
           <KeyLogo />
           <div className="flex flex-col items-center gap-3 mb-6">
             <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl text-center">
-              Netonomy Wallet
+              Netonomy
             </h1>
 
             <div className="text-lg font-normal text-center text-gray-400 max-w-[335px] sm:max-w-full">
               Own your digital identity, data, and finances.
             </div>
           </div>
-
-          <Input
-            placeholder="Lightning Admin Macaroon"
-            value={macaroon}
-            onChange={(e) => setMacaroon(e.target.value)}
-          />
-          {error && (
-            <small className="text-sm font-medium leading-none text-red-600">
-              Error loggin in
-            </small>
-          )}
         </div>
 
         <div className="flex flex-col items-center justify-center gap-4">
           <Button
             className="w-80"
-            onClick={async () => {
-              login();
+            onClick={() => {
+              setShowLoginDialog(true);
             }}
             disabled={loading}
           >
-            Login
+            Import Profile
           </Button>
 
-          {/* <Link href={"/register"}>
+          <Link href={"/register"}>
             <Button variant={"ghost"} className="w-80">
-              Register
+              Create Profile
             </Button>
-          </Link> */}
+          </Link>
         </div>
       </div>
+
+      <Dialog
+        open={showLoginDialog}
+        onOpenChange={() => setShowLoginDialog(false)}
+      >
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Upload profile file</DialogTitle>
+          </DialogHeader>
+          <div className="grid w-full max-w-sm items-center gap-2 p-1">
+            <Input
+              id="file"
+              type="file"
+              accept=".json"
+              onChange={(e) => {
+                if (e.target.files) {
+                  const file = e.target.files[0];
+
+                  const fileReader = new FileReader();
+                  fileReader.readAsText(file, "UTF-8");
+                  fileReader.onload = (e) => {
+                    if (e.target?.result) {
+                      let ionOps = JSON.parse(e.target.result.toString());
+
+                      // If the parsed result is a string, attempt to parse it as JSON again.
+                      if (typeof ionOps === "string") {
+                        try {
+                          ionOps = JSON.parse(ionOps);
+                        } catch (e) {
+                          console.error(
+                            "Could not parse the string a second time.",
+                            e
+                          );
+                        }
+                      }
+
+                      const macaroon = ionOps[1].macaroon;
+                      setMacaroon(macaroon);
+
+                      const privateKeyBase64 = ionOps[0].recovery.privateJwk.d;
+                      const buffer = Buffer.from(privateKeyBase64, "base64");
+                      const hexPrivateKey = buffer.toString("hex");
+
+                      setPrivateKey(hexPrivateKey);
+                    }
+                  };
+                } else {
+                  console.error("Please select a JSON file");
+                }
+              }}
+            />
+
+            {error && (
+              <small className="text-sm font-medium leading-none text-red-600">
+                Invalid Macaroon
+              </small>
+            )}
+          </div>
+          <DialogFooter>
+            <Button
+              type="submit"
+              onClick={() => {
+                setLoading(true);
+                login.mutate(macaroon, {
+                  onSuccess: (res) => {
+                    const token = res.data.bearerToken;
+                    setToken(token);
+                    axiosInstance.defaults.headers.common[
+                      "Authorization"
+                    ] = `Bearer ${token}`;
+                    setLoading(false);
+
+                    router.push("/home");
+                  },
+                  onError: () => {
+                    setLoading(false);
+                    setError(true);
+                  },
+                });
+              }}
+            >
+              Import
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* <p className="text-sm text-muted-foreground p-6">
         Your wallet, your data. 100% open source.

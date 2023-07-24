@@ -6,7 +6,7 @@ import * as bitcoin from "bitcoinjs-lib";
 import config from "@/config";
 
 export default function useWeb5() {
-  const [web5, setWeb5] = useState<any | null>(null);
+  const [web5, setWeb5] = useState<Web5 | null>(null);
   const [did, setDid] = useState<string | null>(null);
 
   const [btcWallet, setBtcWallet] = useState<BtcWallet | null>(null);

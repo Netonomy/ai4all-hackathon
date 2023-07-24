@@ -21,6 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
+import Header from "../header";
 
 interface HumanMessage {
   type: "human";
@@ -64,105 +65,71 @@ export default function AgentPage() {
     ]);
     setMessage("");
 
-    fetch(`${process.env.NEXT_PUBLIC_API_URL2}/v1/ai/chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        input: message,
-      }),
-    }).then((response) => {
-      reader = response?.body?.getReader();
-      reader.read().then(function processResult(result) {
-        if (result.done) return;
-        const data = decoder.decode(result.value, { stream: true });
+    try {
+      fetch(`${process.env.NEXT_PUBLIC_API_URL2}/v1/ai/chat`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          input: message,
+        }),
+      }).then((response) => {
+        reader = response?.body?.getReader();
+        reader.read().then(function processResult(result) {
+          if (result.done) return;
+          const data = decoder.decode(result.value, { stream: true });
 
-        const parsedData = JSON.parse(data);
+          const parsedData = JSON.parse(data);
 
-        if (parsedData.type === "agentEnd") {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            {
-              type: "ai",
-              message: parsedData.action.returnValues.output,
-            },
-          ]);
+          if (parsedData.type === "agentEnd") {
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              {
+                type: "ai",
+                message: parsedData.action.returnValues.output,
+              },
+            ]);
 
-          setLoading(false);
-        } else if (parsedData.type === "agentAction") {
-          setMessages((prevMessages) => [
-            ...prevMessages,
-            {
-              type: "aiAction",
-              tool: parsedData.action.tool,
-              toolInput: parsedData.action.toolInput.input,
-              inProgress: true,
-            },
-          ]);
-        } else if (parsedData.type === "toolEnd") {
-          setMessages((prevMessages) => {
-            const updatedMessages = [...prevMessages];
-            const lastMessage = updatedMessages[updatedMessages.length - 1];
+            setLoading(false);
+          } else if (parsedData.type === "agentAction") {
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              {
+                type: "aiAction",
+                tool: parsedData.action.tool,
+                toolInput: parsedData.action.toolInput.input,
+                inProgress: true,
+              },
+            ]);
+          } else if (parsedData.type === "toolEnd") {
+            setMessages((prevMessages) => {
+              const updatedMessages = [...prevMessages];
+              const lastMessage = updatedMessages[updatedMessages.length - 1];
 
-            if (lastMessage && lastMessage.type === "aiAction") {
-              lastMessage.inProgress = false;
-              lastMessage.toolResponse = parsedData.output;
-            }
+              if (lastMessage && lastMessage.type === "aiAction") {
+                lastMessage.inProgress = false;
+                lastMessage.toolResponse = parsedData.output;
+              }
 
-            return updatedMessages;
-          });
-        }
+              return updatedMessages;
+            });
+          }
 
-        // recursive call to keep reading the stream
-        return reader.read().then(processResult);
+          // recursive call to keep reading the stream
+          return reader.read().then(processResult);
+        });
       });
-    });
+    } catch (err) {
+      console.error(err);
+      setLoading(false);
+    }
   }
 
   return (
     <PageContainer>
-      <div className="absolute top-0 left-0 right-0 h-[80px] z-[100] backdrop-blur-xl bg-white/30 border-b-[1.5px]">
-        <div className="h-full w-full flex items-center p-6">
-          <div className="w-[20%]">
-            <BackBtn />
-          </div>
-          <div className="flex items-center justify-center gap-2 w-[60%]">
-            <KeyLogo height={45} width={45} />
-            {/* <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight">
-              Netonomy
-            </h3> */}
-          </div>
-
-          <div className="flex items-center gap-2 w-[20%] justify-end">
-            {messages.length > 0 && (
-              <Badge onClick={() => setMessages([])} className="cursor-pointer">
-                Reset Chat
-              </Badge>
-            )}
-
-            <DropdownMenu>
-              <DropdownMenuTrigger>
-                <div className="h-[40px] w-[40px]">
-                  <AvatarProfile />
-                </div>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="z-[110]">
-                {/* <DropdownMenuSeparator /> */}
-                <DropdownMenuItem
-                  onClick={() => {
-                    setToken(null);
-                    router.push("/welcome");
-                  }}
-                >
-                  Log Out
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
-          </div>
-        </div>
-      </div>
+      <Header showBackBtn />
 
       <div className="absolute inset-0 flex items-center justify-center -z-10">
         <div className="relative flex flex-col items-center gap-4 w-[500px]">
