@@ -39,7 +39,7 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  */
 export default Router({ mergeParams: true }).post(
   "/v1/ai/chat",
-  authenticateToken,
+  // authenticateToken,
   async (req, res) => {
     try {
       const { input } = req.body;

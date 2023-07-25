@@ -5,29 +5,15 @@ import {
   initializeAgentExecutorWithOptions,
 } from "langchain/agents";
 import { ChatOpenAI } from "langchain/chat_models/openai";
-import {
-  DynamicTool,
-  SerpAPI,
-  ChainTool,
-  DynamicStructuredTool,
-} from "langchain/tools";
-import { Calculator } from "langchain/tools/calculator";
+import { DynamicTool, SerpAPI, ChainTool } from "langchain/tools";
 import { createChainAddress } from "lightning";
 import { lnd } from "./lndClient.js";
-import { HumanMessage, AIMessage } from "langchain/schema";
-import { BufferMemory, ChatMessageHistory } from "langchain/memory";
-import { PDFLoader } from "langchain/document_loaders/fs/pdf";
 import { MemoryVectorStore } from "langchain/vectorstores/memory";
 import { OpenAIEmbeddings } from "langchain/embeddings/openai";
-import { Document } from "langchain/dist/document.js";
-import { VectorDBQAChain } from "langchain/chains";
+import { Document } from "langchain/document";
 import { OpenAI } from "langchain/llms/openai";
-import { TextLoader } from "langchain/document_loaders/fs/text";
-import { HNSWLib } from "langchain/vectorstores/hnswlib";
-import { DocxLoader } from "langchain/document_loaders/fs/docx";
-import { WebBrowser } from "langchain/tools/webbrowser";
-import { z } from "zod";
 import { DateSort } from "@tbd54566975/dwn-sdk-js";
+import { VectorDBQAChain } from "langchain/chains";
 
 // global scope (outside of the route)
 let dwn: DwnApi;
@@ -51,93 +37,34 @@ async function initResources() {
     },
   });
 
-  const pastMessages = await Promise.all(
+  const memoryDocs = await Promise.all(
     records.map(async (record) => {
       const serializedMessage = await record.data.json();
       const {
         kwargs: { content },
       } = serializedMessage;
 
-      return serializedMessage.id.includes("HumanMessage")
-        ? new HumanMessage({ content })
-        : new AIMessage({ content });
+      return new Document({
+        pageContent: content,
+        metadata: {
+          role: serializedMessage.id.at(-1),
+          dateCreated: record.dateCreated,
+        },
+      });
     })
   );
 
-  const memory = new BufferMemory({
-    chatHistory: new ChatMessageHistory(pastMessages),
-    returnMessages: true,
-    memoryKey: "chat_history",
-    inputKey: "input",
-    outputKey: "output",
+  const embeddings = new OpenAIEmbeddings({
+    modelName: "text-embedding-ada-002",
   });
-
-  // const filesRes = await web5.dwn.records.query({
-  //   message: {
-  //     filter: {
-  //       schema: "https://schema.org/DigitalDocument",
-  //     },
-  //   },
-  // });
-
-  // let docs: Document<Record<string, any>>[] = [];
-
-  // if (filesRes.records) {
-  //   for (const record of filesRes.records) {
-  //     const file = await record.data.json();
-  //     const blobRecordId = file.blobRecordId;
-
-  //     const blobRes = await web5.dwn.records.read({
-  //       message: {
-  //         recordId: blobRecordId,
-  //       },
-  //     });
-
-  //     if (blobRes.record) {
-  //       const blob = await blobRes.record.data.blob();
-
-  //       console.log(blob.type);
-
-  //       let loader;
-  //       if (blob.type === "application/pdf") {
-  //         // loader = new PDFLoader(blob);
-  //       } else if (blob.type === "text/plain") {
-  //         // loader = new TextLoader(blob);
-  //       } else if (
-  //         blob.type ===
-  //         "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  //       ) {
-  //         loader = new DocxLoader(blob);
-  //       }
-  //       if (loader) {
-  //         const result = await loader.load();
-  //         docs = docs.concat(result);
-  //       }
-  //     }
-  //   }
-  // }
-
-  // Load the docs into the vector store
-  // const vectorStore = await HNSWLib.fromDocuments(
-  //   docs,
-  //   new OpenAIEmbeddings({
-  //     modelName: "text-embedding-ada-002",
-  //   })
-  // );
-  // const model = new OpenAI({ temperature: 0, modelName: "gpt-3.5-turbo-16k" });
-  // const chain = VectorDBQAChain.fromLLM(model, vectorStore);
-  // const qaTool = new ChainTool({
-  //   name: "files-qa",
-  //   description:
-  //     "Ideal for querying and navigating through large volumes of documents using conversational interactions. Call this function when you need access to the users information in their documents.",
-  //   chain: chain,
-  // });
-
-  const model = new OpenAI({ temperature: 0, modelName: "gpt-3.5-turbo-16k" });
-  const embeddings = new OpenAIEmbeddings();
+  const model = new OpenAI({ modelName: "gpt-3.5-turbo" });
+  const vectorStore = await MemoryVectorStore.fromDocuments(
+    memoryDocs,
+    embeddings
+  );
+  const memoryRetrievalChain = VectorDBQAChain.fromLLM(model, vectorStore);
 
   const tools = [
-    new Calculator(),
     new SerpAPI(),
     new DynamicTool({
       name: "bitcoin-address-generator",
@@ -150,63 +77,23 @@ async function initResources() {
         return address;
       },
     }),
-    new WebBrowser({ model, embeddings }),
-    new DynamicStructuredTool({
-      name: "decentralized-web-node-storer",
+    new ChainTool({
+      name: "memory-qa",
       description:
-        "stores data to a users decentralized web node. Useful when you need to save information.",
-      schema: z.object({
-        schema: z
-          .string()
-          .describe("The URI of a schema that reprensets the data structure"),
-        data: z
-          .any()
-          .describe(
-            "The data to store in the web node. Make this a JSON object."
-          ),
-      }),
-      func: async ({ schema, data }) => {
-        const res = await web5.dwn.records.create({
-          data: data,
-          message: {
-            schema: schema,
-          },
-        });
-
-        return JSON.stringify(res.status);
-      },
+        "This provides access to a vector database that has information from all previous messages between you and the user. You may need to be creative with your input to be able to find the info your looking for.",
+      chain: memoryRetrievalChain,
     }),
-    new DynamicStructuredTool({
-      name: "decentralized-web-node-fetcher",
-      description:
-        "fetches data from a users decentralized web node. Useful when you need to get some information.",
-      schema: z.object({
-        schema: z
-          .string()
-          .describe("The URI of a schema that reprensets the data structure"),
-      }),
-      func: async ({ schema }) => {
-        const { records = [] } = await web5.dwn.records.query({
-          message: {
-            filter: {
-              schema,
-            },
-          },
-        });
-
-        let data = [];
-        for (const record of records) {
-          const d = await record.data.json();
-          data.push(d);
-        }
-
-        return JSON.stringify(data);
+    new DynamicTool({
+      name: "current-date",
+      description: "useful when you need to know the current date",
+      func: async () => {
+        return new Date().toLocaleDateString();
       },
     }),
   ];
 
   const chat = new ChatOpenAI({
-    modelName: "gpt-3.5-turbo-0613",
+    modelName: "gpt-4-0613",
     temperature: 0,
   });
 
@@ -216,10 +103,6 @@ async function initResources() {
     agentType: "openai-functions",
     verbose: false,
     maxIterations: 10,
-    // memory,
-    // agentArgs: {
-    //   prefix,
-    // },
   });
 }
 
