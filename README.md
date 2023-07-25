@@ -4,11 +4,16 @@ Netonomy aims to help people and organizations take control of their digital ide
 
 ## 🤯 Features
 
-- 💻 Your own Server and API
+- ⚡️ Lightning node
 - 💽 Decentralized Web Node
-- ₿ Bitcoin wallet
-- ⚡️ A lightning node
+- 🕸️ Nostr Client
+- 💻 Your own Server and API
+- 🤝 LNURL
 - 🤖 Autonomous Agent
+
+## 🏛️ Architecture
+
+![Architecture Diagram](./docs/images/Blank%20diagram.png)
 
 ## 📖 Documentation
 
