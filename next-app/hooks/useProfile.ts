@@ -6,10 +6,7 @@ import { personAtom } from "@/state/user/personAtom";
 import { Event, SimplePool, getPublicKey } from "nostr-tools";
 import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
 import { Profile } from "@/types/Profile";
-
-const pool = new SimplePool();
-
-let relays = ["wss://relay.snort.social"];
+import { pool, relays } from "@/config";
 
 export default function useProfile() {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -49,7 +46,6 @@ export default function useProfile() {
   }
 
   useEffect(() => {
-    // fetchProfile();
     getProfile();
   }, [privateKey, web5]);
 

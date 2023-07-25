@@ -45,10 +45,7 @@ import { loadingAtom } from "@/state/loadingAtom";
 import { tokenAtom } from "@/state/tokenAtom";
 import axiosInstance from "@/config/axiosInstance";
 import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
-
-const pool = new SimplePool();
-
-let relays = ["wss://relay.snort.social", "wss://relayable.org"];
+import { pool, relays } from "@/config";
 
 const schema = yup
   .object({

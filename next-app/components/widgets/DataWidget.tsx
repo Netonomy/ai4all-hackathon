@@ -13,7 +13,10 @@ export default function DataWidget() {
         router.push("data");
       }}
     >
-      <CardContent className="flex  flex-col w-full overflow-y-auto">
+      <CardHeader className="pl-4 pt-3">
+        <CardTitle>Storage</CardTitle>
+      </CardHeader>
+      <CardContent className="flex flex-col max-h-[400px] w-full overflow-y-auto">
         <FilesList searchText="" />
       </CardContent>
     </Card>

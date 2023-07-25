@@ -1,26 +1,9 @@
-import { Network, networks } from "bitcoinjs-lib";
+import { SimplePool } from "nostr-tools";
 
-interface Config {
-  network: Network;
-}
+export const pool = new SimplePool();
 
-const getNetwork = (env: string | undefined): Network => {
-  switch (env) {
-    case "regtest":
-      return networks.regtest;
-    case "testnet":
-      return networks.testnet;
-    case "mainnet":
-      return networks.bitcoin;
-    default:
-      throw new Error(
-        `Invalid Btc network: ${env}. Set it to either 'regtest', 'testnet' or 'mainnet'.`
-      );
-  }
-};
-
-const config: Config = {
-  network: getNetwork(process.env.NEXT_PUBLIC_BITCOIN_NETWORK),
-};
-
-export default config;
+export let relays = [
+  "wss://relay.snort.social",
+  "wss://relayable.org",
+  "wss://relay.damus.io",
+];
