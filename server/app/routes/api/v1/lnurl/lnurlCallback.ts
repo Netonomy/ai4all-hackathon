@@ -1,18 +1,35 @@
 import { Router } from "express";
 import base64url from "base64url";
 import queryString from "query-string";
+import { lnd } from "../../../../config/lndClient.js";
+import { createInvoice } from "lightning";
+import Joi from "joi";
+import bech32 from "bech32";
+
+const schema = Joi.object({
+  amount: Joi.string().required(),
+  nostr: Joi.string().optional(),
+});
 
 /**
  * @swagger
- * /api/v1/lnurl:
+ * /api/v1/lnurl/{q}:
  *   get:
  *     security:
  *       - bearerAuth: []
  *     parameters:
- *       - in: query
+ *       - in: path
  *         name: q
  *         type: string
  *         required: true
+ *       - in: query
+ *         name: amount
+ *         type: number
+ *         required: true
+ *       - in: query
+ *         name: nostr
+ *         type: string
+ *         required: false
  *     responses:
  *       200:
  *         description: OK
@@ -20,20 +37,16 @@ import queryString from "query-string";
  *       - lnurl
  */
 export default Router({ mergeParams: true }).get(
-  "/v1/lnurl",
+  "/v1/lnurl/:q",
   //   authenticateToken,
   async (req, res) => {
     try {
-      const { q } = req.query;
+      const q = req.params.q;
 
-      if (!q)
-        return res.status(400).json({
-          status: "FAILED",
-          message: "no q params",
-        });
+      const { amount, nostr } = req.query;
 
       // base64url decode and parse the parameters
-      const decodedParams = queryString.parse(base64url.decode(q as string));
+      const decodedParams = queryString.parse(base64url.decode(q));
 
       const {
         tag,
@@ -45,15 +58,11 @@ export default Router({ mergeParams: true }).get(
         commentAllowed,
       } = decodedParams;
 
+      const invoice = await createInvoice({ lnd, mtokens: amount as string });
+
       res.json({
-        tag,
-        minSendable: Number(minSendable),
-        maxSendable: Number(maxSendable),
-        metadata,
-        allowsNostr: Boolean(allowsNostr),
-        nostrPubKey,
-        commentAllowed: parseInt(commentAllowed as string),
-        callback: `http://localhost:3300/api/v1/lnurl/${q}`,
+        pr: invoice.request,
+        routes: [],
       });
     } catch (err: any) {
       console.error(err);
