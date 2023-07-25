@@ -9,3 +9,5 @@ EVENTLOG/
 INDEX/
 MESSAGESTORE/
 files/
+*.macaroon
+*.cert
