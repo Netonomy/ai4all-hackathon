@@ -1,10 +1,11 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dispatch, SetStateAction, useCallback, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
-import { Button } from "./ui/button";
 import { X } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
-export default function ProfileImgSelector(props: {
+export default function BannerImgSelector(props: {
   file: File | null;
   setFile: Dispatch<SetStateAction<File | null>>;
 }) {
@@ -81,13 +82,14 @@ export default function ProfileImgSelector(props: {
     const files = e.target.files;
 
     if (files) {
-      setImageToCrop(files[0]);
-      setShowCropper(true);
+      props.setFile(files[0]);
+      //   setImageToCrop(files[0]);
+      //   setShowCropper(true);
     }
   };
 
   return (
-    <div className="mb-[70px] flex items-center justify-center flex-col gap-2">
+    <div className="mt-[100px] flex items-center justify-center flex-col gap-2">
       {showCropper && imageToCrop && (
         <div className="absolute top-0 right-0 bottom-0 left-0 z-[100] bg-black">
           <Button
@@ -109,7 +111,7 @@ export default function ProfileImgSelector(props: {
             image={URL.createObjectURL(imageToCrop)}
             crop={crop}
             zoom={zoom}
-            aspect={1 / 1}
+            aspect={16 / 9} // Changed aspect ratio for banner
             onCropChange={setCrop}
             onCropComplete={onCropComplete}
             onZoomChange={setZoom}
@@ -121,19 +123,20 @@ export default function ProfileImgSelector(props: {
         </div>
       )}
 
-      <Avatar
-        className="h-16 w-16"
+      <div
+        className="h-36 w-96 min-h-36 min-w-96 rounded-3xl bg-gray-400 relative overflow-hidden"
         onClick={() => {
           inputref.current.click();
         }}
       >
-        <AvatarImage
-          src={props.file ? URL.createObjectURL(props.file) : undefined}
-        />
-        <AvatarFallback>
-          <div className="rounded-full h-16 w-16 bg-gray-400 file:text-transparent" />
-        </AvatarFallback>
-      </Avatar>
+        {props.file && (
+          <Image
+            src={URL.createObjectURL(props.file)}
+            alt="banner image"
+            fill
+          />
+        )}
+      </div>
       <input
         type="file"
         accept="image/*"
@@ -142,7 +145,7 @@ export default function ProfileImgSelector(props: {
         ref={inputref}
       />
 
-      <p className="text-sm text-muted-foreground">Select a profile image.</p>
+      <p className="text-sm text-muted-foreground">Select a banner image.</p>
     </div>
   );
 }

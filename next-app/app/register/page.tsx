@@ -46,6 +46,7 @@ import { tokenAtom } from "@/state/tokenAtom";
 import axiosInstance from "@/config/axiosInstance";
 import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
 import { pool, relays } from "@/config";
+import BannerImgSelector from "./BannerImgSelector";
 
 const schema = yup
   .object({
@@ -113,6 +114,21 @@ export default function Register() {
             }
           }
 
+          // store banner img in dwn
+          let bannerImgRecordId = "";
+          if (bannerImg) {
+            const { record } = await web5!.dwn.records.create({
+              data: bannerImg,
+              message: {
+                dataFormat: "image/png",
+              },
+            });
+
+            if (record) {
+              bannerImgRecordId = record.id;
+            }
+          }
+
           // Generate keys and ION DID
           let authnKeys = await generateKeyPair();
           let did = new DID({
@@ -153,7 +169,8 @@ export default function Register() {
             content: JSON.stringify({
               name: data.name,
               about: data.about,
-              picture: profileImgRecordId,
+              picture: profileImgRecordId, // TODO: update to dwn url
+              banner: bannerImgRecordId, // TODO: update to dwn url
             }),
           };
           event.id = getEventHash(event);
@@ -182,6 +199,7 @@ export default function Register() {
   });
 
   const [profileImg, setProfileImg] = useState<File | null>(null);
+  const [bannerImg, setBannerImg] = useState<File | null>(null);
 
   const router = useRouter();
   const { web5, did } = useWeb5();
@@ -192,7 +210,11 @@ export default function Register() {
         className="flex flex-1 flex-col w-80 items-center"
         onSubmit={onSubmit}
       >
-        <ProfileImgSelector file={profileImg} setFile={setProfileImg} />
+        <div className="flex flex-col gap-6 ">
+          <BannerImgSelector file={bannerImg} setFile={setBannerImg} />
+
+          <ProfileImgSelector file={profileImg} setFile={setProfileImg} />
+        </div>
 
         <div className="w-full gap-4 flex flex-1 flex-col ">
           <Input placeholder="Name" {...register("name")} />

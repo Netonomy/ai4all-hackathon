@@ -1,6 +1,6 @@
 import { balanceAtom } from "@/state/finance/balanceAtom";
 import { useAtom } from "jotai";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Skeleton } from "../../components/ui/skeleton";
 import axiosInstance from "@/config/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
@@ -19,6 +19,9 @@ export default function FinanceTotalItem() {
   );
 
   const [balance, setBalance] = useAtom(balanceAtom);
+
+  const [leading, setLeading] = useState("");
+  const [actual, setActual] = useState("");
 
   async function formatBalance() {
     let balance = balanceQuery.data;
@@ -55,6 +58,8 @@ export default function FinanceTotalItem() {
       }
 
       setBalance(leadingString + actualBalanceString);
+      setLeading(leadingString);
+      setActual(actualBalanceString);
     }
   }
 
@@ -66,12 +71,18 @@ export default function FinanceTotalItem() {
     <>
       {!balanceQuery.isLoading ? (
         <div className="rounded-lg bg-[#F1F5F9] dark:bg-[#1d1d1d] h-9 min-h-[32px] w-full flex items-center justify-between p-2 lg:h-11">
-          <p className="text-sm text-muted-foreground lg:text-base">Total</p>
+          <p className="text-sm text-muted-foreground lg:text-base dark:text-gray-400">
+            Total
+          </p>
 
-          <div className="text-lg font-medium flex gap-1">
-            ₿<div>{balance}</div>
+          <h4 className="scroll-m-20 text-lg font-semibold tracking-tight flex gap-1 p-2">
+            ₿
+            <div className="flex items-center">
+              <div className="text-gray-400">{leading}</div>
+              <div className="text-black dark:text-white"> {actual}</div>
+            </div>
             sats
-          </div>
+          </h4>
         </div>
       ) : (
         <Skeleton className="rounded-lg bg-[#F1F5F9] dark:bg-[#1d1d1d] h-9 min-h-[32px] w-full flex items-center justify-between p-2 lg:h-11" />

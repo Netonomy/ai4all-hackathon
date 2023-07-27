@@ -10,13 +10,14 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { tokenAtom } from "@/state/tokenAtom";
 import { useAtom } from "jotai";
-import router from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function Header({ showBackBtn }: { showBackBtn?: boolean }) {
   const [, setToken] = useAtom(tokenAtom);
+  const router = useRouter();
 
   return (
-    <div className="absolute top-0 left-0 right-0 h-[80px] z-[100] backdrop-blur-xl bg-white/30 border-b-[1.5px] dark:bg-black/30">
+    <div className="absolute top-0 left-0 right-0 h-[70px] z-[100] backdrop-blur-xl bg-white/30 border-b-[1.5px] dark:bg-black/30">
       <div className="h-full w-full flex items-center p-6">
         <div className="w-[20%]">{showBackBtn && <BackBtn />}</div>
 

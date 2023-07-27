@@ -4,9 +4,9 @@ import { Button } from "./ui/button";
 
 export default function FinanceRequestAndPayButtons() {
   return (
-    <div className="flex items-center justify-around h-10 w-full gap-2 p-2 lg:p-4 lg:gap-4">
+    <div className="flex items-center justify-around h-10  gap-2 p-2 lg:p-4 lg:gap-10">
       <Button
-        className="flex flex-1 lg:font-normal lg:text-2xl dark:bg-[#1d1d1d] dark:text-white"
+        className="flex flex-1 lg:font-normal lg:text-xl h-9 w-32"
         onClick={(e) => {
           e.stopPropagation();
         }}
@@ -22,7 +22,7 @@ export default function FinanceRequestAndPayButtons() {
         />
       </Button> */}
       <Button
-        className="flex flex-1 lg:font-normal lg:text-2xl dark:bg-[#1d1d1d] dark:text-white"
+        className="flex flex-1 lg:font-normal lg:text-xl h-9 w-32"
         onClick={(e) => {
           e.stopPropagation();
         }}

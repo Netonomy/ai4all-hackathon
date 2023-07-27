@@ -17,7 +17,7 @@ export default function TransactionsList() {
   });
 
   return (
-    <div className="flex flex-col flex-1 items-center w-full overflow-y-auto">
+    <div className="flex flex-col flex-1 items-center w-full overflow-y-auto p-2 mb-2">
       {transactionsQuery.isLoading ? (
         Array.from({ length: 3 }).map((_, i) => (
           <Skeleton
@@ -45,7 +45,7 @@ export default function TransactionsList() {
                 </div>
 
                 <div className="flex flex-1 flex-col h-auto justify-center">
-                  <p className="max-w-[225px] truncate">
+                  <p className="max-w-[155px] truncate">
                     {transaction.output_addresses[0]}
                   </p>
 

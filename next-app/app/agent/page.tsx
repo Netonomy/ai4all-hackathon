@@ -21,7 +21,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useRouter } from "next/navigation";
-import Header from "../header";
+import Header from "../Header";
 
 interface HumanMessage {
   type: "human";

@@ -7,9 +7,10 @@ import { Event, SimplePool, getPublicKey } from "nostr-tools";
 import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
 import { Profile } from "@/types/Profile";
 import { pool, relays } from "@/config";
+import { profileAtom } from "@/state/user/profileAtom";
 
 export default function useProfile() {
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useAtom(profileAtom);
   const { web5 } = useWeb5();
   const [privateKey] = useAtom(privateKeyHexAtom);
 
@@ -38,6 +39,20 @@ export default function useProfile() {
           const blobUrl = URL.createObjectURL(blob);
 
           profile.picture = blobUrl;
+        }
+
+        // fetch the banner image
+        if (profile.banner) {
+          const { record } = await web5!.dwn.records.read({
+            message: {
+              recordId: profile.banner,
+            },
+          });
+
+          const blob = await record.data.blob();
+          const blobUrl = URL.createObjectURL(blob);
+
+          profile.banner = blobUrl;
         }
 
         setProfile(profile);
