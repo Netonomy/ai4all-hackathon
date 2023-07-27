@@ -13,6 +13,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import ProfileSearch from "./ProfileSearch";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function Home() {
   const router = useRouter();
@@ -27,6 +34,20 @@ export default function Home() {
       <div className="w-full lg:col-span-1 flex flex-1 flex-col h-full overflow-y-auto overflow-x-hidden">
         <div className="mt-[80px]">
           <CreatePost />
+        </div>
+
+        <div className=" flex items-center gap-2 mb-4">
+          <div className="border-b border-gray-300 my-4 w-full"></div>
+
+          <Select defaultValue="trending">
+            <SelectTrigger className="w-[150px] border-none focus:ring-0 ring-0 bg-transparent focus:bg-transparent focus:ring-transparent">
+              <SelectValue placeholder="Select" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="trending">🔥 Trending</SelectItem>
+              <SelectItem value="following">💛 Following</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
 
         <SocialFeed />

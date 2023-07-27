@@ -2,14 +2,18 @@ import AvatarProfile from "@/components/AvatarProfile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import useEventReactions from "@/hooks/nostr/useEventReactions";
 import useNostrProfile from "@/hooks/nostr/useNostrProfile";
 import { timeStampToTimeAgo } from "@/utils/timestampToTimeAgo";
+import { HeartIcon } from "lucide-react";
 import Image from "next/image";
 import { Event } from "nostr-tools";
 
 export default function SocialPost({ event }: { event: Event<1 | 6 | 65003> }) {
   const profile = useNostrProfile(event.pubkey);
   const content = profile ? JSON.parse(profile.content) : null;
+
+  const numReactions = useEventReactions(event);
 
   // console.log(content);
 
@@ -38,10 +42,26 @@ export default function SocialPost({ event }: { event: Event<1 | 6 | 65003> }) {
         </div>
       </CardHeader>
 
-      <CardContent className="w-full relative">
+      <CardContent className="w-full relative flex flex-col">
         <p className="leading-7 [&:not(:first-child)]:mt-6 break-words">
           {event.content}
         </p>
+
+        <div className="mt-6">
+          {numReactions ? (
+            <div className="flex items-center gap-1">
+              <div className="cursor-pointer">
+                <HeartIcon />
+              </div>
+
+              <small className="text-sm font-medium leading-none">
+                {numReactions}
+              </small>
+            </div>
+          ) : (
+            <Skeleton className="w-12 h-6" />
+          )}
+        </div>
       </CardContent>
     </Card>
   );

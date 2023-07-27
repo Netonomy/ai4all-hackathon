@@ -6,7 +6,7 @@ import { Textarea } from "@/components/ui/textarea";
 
 export default function CreatePost() {
   return (
-    <Card className="rounded-2xl mb-8">
+    <Card className="rounded-2xl mb-4">
       <CardContent className="flex flex-col items-center">
         <div className="flex w-full ">
           <div className="w-10 h-10 min-w-[40px] min-h-[40px] mt-2">
