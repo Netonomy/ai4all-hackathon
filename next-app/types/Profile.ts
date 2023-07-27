@@ -3,4 +3,5 @@ export interface Profile {
   about?: string;
   picture?: string;
   banner?: string;
+  npub?: string;
 }

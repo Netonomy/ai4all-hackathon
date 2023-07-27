@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import useWeb5 from "./useWeb5";
 import { useAtom } from "jotai";
 import { personAtom } from "@/state/user/personAtom";
-import { Event, SimplePool, getPublicKey } from "nostr-tools";
+import { Event, SimplePool, getPublicKey, nip19 } from "nostr-tools";
 import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
 import { Profile } from "@/types/Profile";
 import { pool, relays } from "@/config";
@@ -17,6 +17,7 @@ export default function useProfile() {
   async function getProfile() {
     if (privateKey && web5) {
       const pubKey = getPublicKey(privateKey);
+      const npub = nip19.npubEncode(pubKey);
       const event = await pool.list(relays, [
         {
           kinds: [0],
@@ -26,6 +27,7 @@ export default function useProfile() {
 
       if (event.length > 0) {
         let profile: Profile = JSON.parse(event[0].content);
+        profile.npub = npub;
 
         // fetch the profile image
         if (profile.picture) {

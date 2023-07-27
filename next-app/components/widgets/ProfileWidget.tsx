@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 import { Skeleton } from "../ui/skeleton";
 import { useAtom } from "jotai";
 import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
-import { getPublicKey } from "nostr-tools";
+import { getPublicKey, nip19 } from "nostr-tools";
 import { CheckCircle, CopyIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
@@ -13,13 +13,12 @@ import Image from "next/image";
 
 export default function ProfileWidget() {
   const { profile } = useProfile();
-  const [privateKeyHex] = useAtom(privateKeyHexAtom);
+
   const [copied, setCopied] = useState(false);
 
   function copyPubKeyToClipboard() {
-    if (privateKeyHex) {
-      const pubkey = getPublicKey(privateKeyHex);
-      navigator.clipboard.writeText(pubkey).then(() => {
+    if (profile?.npub) {
+      navigator.clipboard.writeText(profile?.npub).then(() => {
         setCopied(true);
 
         setTimeout(() => setCopied(false), 3000);
@@ -55,11 +54,11 @@ export default function ProfileWidget() {
           </h4>
         )}
 
-        {privateKeyHex ? (
+        {profile?.npub ? (
           <div className="flex items-center gap-2">
             🔑
             <p className="text-sm text-muted-foreground max-w-[250px] truncate">
-              {getPublicKey(privateKeyHex)}
+              {profile.npub}
             </p>
             {copied ? (
               <CheckCircle className="h-4 w-4 cursor-pointer text-green-600" />
