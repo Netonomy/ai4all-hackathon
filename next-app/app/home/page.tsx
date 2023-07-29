@@ -25,18 +25,18 @@ export default function Home() {
   const router = useRouter();
 
   return (
-    <div className="flex flex-1 flex-col w-full items-center gap-4 pt-8 pl-4 pr-4 overflow-y-auto lg:grid grid-cols-[0.6fr,1.6fr,0.6fr] lg:items-start  lg:pt-0  lg:pr-12 lg:pl-12 bg-[#f7f7f7] dark:bg-[#080808]">
-      <div className="w-full lg:col-span-1 flex flex-col gap-4 h-full pt-[80px]">
+    <div className="flex flex-1 w-full flex-row items-center mb-4">
+      <div className="w-0 h-0 hidden flex-col items-center  lg:flex lg:h-full  lg:w-[30%] gap-6">
         <ProfileWidget />
         <FinancesWidget />
       </div>
 
-      <div className="w-full lg:col-span-1 flex flex-1 flex-col h-full overflow-y-auto overflow-x-hidden">
-        <div className="mt-[80px]">
+      <div className="w-full h-full flex flex-col items-center lg:w-[60%] xl:w-[40%] overflow-y-auto max-h-screen">
+        <div className="mt-[90px] w-full">
           <CreatePost />
         </div>
 
-        <div className=" flex items-center gap-2 mb-4">
+        <div className=" flex items-center gap-2 mb-4 w-full">
           <div className="border-b border-gray-300 my-4 w-full"></div>
 
           <Select defaultValue="trending">
@@ -49,9 +49,7 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
-
         <SocialFeed />
-
         {/* <div
           className="flex items-center relative"
           onClick={() => router.push("/agent")}
@@ -60,8 +58,8 @@ export default function Home() {
         </div> */}
       </div>
 
-      <div className=" lg:col-span-1 flex flex-col gap-4 h-full pt-[80px]">
-        <ProfileSearch />
+      <div className="w-0 h-0 hidden flex-col items-center  lg:flex lg:h-full  lg:w-[30%] gap-6">
+        {/* <ProfileSearch /> */}
 
         <DataWidget />
       </div>

@@ -17,7 +17,7 @@ export default function TransactionsList() {
   });
 
   return (
-    <div className="flex flex-col flex-1 items-center w-full overflow-y-auto p-2 mb-2">
+    <div className="flex flex-col flex-1 items-center w-full overflow-y-auto ">
       {transactionsQuery.isLoading ? (
         Array.from({ length: 3 }).map((_, i) => (
           <Skeleton
@@ -27,7 +27,8 @@ export default function TransactionsList() {
         ))
       ) : (
         <>
-          {transactionsQuery.data && transactionsQuery.data.length > 0 ? (
+          {transactionsQuery.data &&
+            transactionsQuery.data.length > 0 &&
             transactionsQuery.data.map((transaction) => (
               <div
                 className="w-full h-12 min-h-[48px] lg:min-h-[55px] rounded-lg p-2 flex items-center gap-2 hover:bg-gray-100 dark:hover:bg-[#1d1d1d] cursor-pointer"
@@ -69,12 +70,7 @@ export default function TransactionsList() {
                   </small>
                 </div>
               </div>
-            ))
-          ) : (
-            <div className="h-full w-full flex items-center justify-center ">
-              No Transactions.
-            </div>
-          )}
+            ))}
         </>
       )}
     </div>

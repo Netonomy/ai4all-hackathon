@@ -31,7 +31,7 @@ function renderContent(content) {
       if (isImageUrl) {
         return (
           <img
-            className="max-w-md max-h-md"
+            className="max-w-md max-h-md rounded-xl"
             key={idx}
             src={word}
             alt="content"
@@ -61,7 +61,7 @@ export default function SocialPost({ event }: { event: Event<1 | 6 | 65003> }) {
   const numReactions = useEventReactions(event);
 
   return (
-    <Card className="p-5 mb-4 rounded-xl">
+    <Card className="p-5 mb-4 rounded-2xl">
       <CardHeader>
         <div className="flex items-center gap-4">
           <Avatar>

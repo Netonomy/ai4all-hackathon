@@ -44,7 +44,7 @@ export default function ListItem(props: {
 
       <div className="flex flex-1 flex-col ml-4 gap-[2px]">
         {!editing || !props.updateFilename ? (
-          <div className="text-md md:text-lg font-normal max-w-[221px] sm:max-w-[225px] truncate">
+          <div className="text-md md:text-lg font-normal max-w-[221px] sm:max-w-[185px] truncate">
             {props.title}
           </div>
         ) : (

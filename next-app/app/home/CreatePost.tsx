@@ -13,7 +13,7 @@ export default function CreatePost() {
             <AvatarProfile />
           </div>
 
-          <Textarea
+          <Input
             placeholder="Share something..."
             className="shadow-none ml-2 min-h-[55px] h-auto max-h-[200px] bg-gray-100 dark:bg-[#1d1d1d] rounded-3xl text-black"
           />

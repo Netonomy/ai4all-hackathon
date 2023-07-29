@@ -27,7 +27,7 @@ export default function ProfileWidget() {
   }
 
   return (
-    <Card className="w-full min-h-[150px] rounded-3xl">
+    <Card className="min-h-[150px] rounded-2xl w-[90%] max-w-[335px] mt-[90px]">
       <CardContent className="h-full flex items-center justify-center gap-2 lg:gap-2 lg:flex-col">
         <div className="w-full relative mb-10 mt-2">
           <div className="w-full h-28">

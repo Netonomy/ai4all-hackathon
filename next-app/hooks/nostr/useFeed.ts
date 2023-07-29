@@ -1,5 +1,6 @@
 import { pool, relays } from "@/config";
 import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
+import { feedAtom } from "@/state/social/feedAtom";
 import { useAtom } from "jotai";
 import {
   Event,
@@ -12,7 +13,7 @@ import {
 import { useEffect, useState } from "react";
 
 export default function useFeed() {
-  const [feed, setFeed] = useState<Event<1 | 6 | 65003>[] | null>(null);
+  const [feed, setFeed] = useAtom(feedAtom);
   const [privateKeyHex] = useAtom(privateKeyHexAtom);
 
   async function getFeed() {

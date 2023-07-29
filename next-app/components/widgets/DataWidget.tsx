@@ -8,7 +8,7 @@ export default function DataWidget() {
   const router = useRouter();
   return (
     <Card
-      className="w-full  z-0 cursor-pointer rounded-2xl"
+      className="w-[90%] max-w-[335px]   z-0 cursor-pointer rounded-2xl mt-[90px]"
       onClick={(e) => {
         router.push("data");
       }}
