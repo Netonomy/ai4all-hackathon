@@ -20,6 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
+import DataTopBar from "@/components/DataTopBar";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 export default function Home() {
   const router = useRouter();
@@ -31,13 +34,19 @@ export default function Home() {
         <FinancesWidget />
       </div>
 
-      <div className="w-full h-full flex flex-col items-center lg:w-[60%] xl:w-[40%] overflow-y-auto max-h-screen">
-        <div className="mt-[90px] w-full">
-          <CreatePost />
+      <div className="w-full h-full flex flex-col items-center lg:w-[40%] xl:w-[41%] overflow-y-auto max-h-[calc(100vh)]">
+        <div className="mt-[90px] w-[98%] md:w-full z-40">
+          <DataTopBar
+            placeholder="Share something..."
+            searchText={""}
+            setSearchText={null}
+            uploadBtnAccept="*"
+            onFilesSelected={async (files: FileList) => {}}
+          />
         </div>
 
-        <div className=" flex items-center gap-2 mb-4 w-full">
-          <div className="border-b border-gray-300 my-4 w-full"></div>
+        <div className="flex items-center gap-2 my-2 w-full">
+          <div className="border-b border-gray-300 w-full dark:border-[#1d1d1d]"></div>
 
           <Select defaultValue="trending">
             <SelectTrigger className="w-[150px] border-none focus:ring-0 ring-0 bg-transparent focus:bg-transparent focus:ring-transparent">
@@ -49,13 +58,12 @@ export default function Home() {
             </SelectContent>
           </Select>
         </div>
-        <SocialFeed />
-        {/* <div
-          className="flex items-center relative"
-          onClick={() => router.push("/agent")}
-        >
-          <AiChatTextArea input={""} setInput={null} disabled={false} />
-        </div> */}
+
+        <Card className={`flex flex-1 rounded-none md:rounded-xl w-full }`}>
+          <CardContent className="flex flex-1 flex-col items-center w-full overflow-y-auto overflow-x-visible">
+            <SocialFeed />
+          </CardContent>
+        </Card>
       </div>
 
       <div className="w-0 h-0 hidden flex-col items-center  lg:flex lg:h-full  lg:w-[30%] gap-6">

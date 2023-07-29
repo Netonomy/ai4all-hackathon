@@ -1,21 +1,12 @@
 version: "3.9"
 services:
-  # dwn-server:
-  #   image: ghcr.io/tbd54566975/dwn-server:main
-  #   container_name: dwn-server
-  #   ports:
-  #     - 3000:3000
-  #   volumes:
-  #     - ./dwn-data:/dwn-server/data
-  #   networks:
-  #     - backend
-
   server:
     build:
       context: server
       dockerfile: Dockerfile.local
     ports:
       - 3300:3300
+      - 3400:3400
     volumes:
       - ./server:/usr/src/app
     networks:
@@ -31,6 +22,16 @@ services:
       - ./next-app:/usr/src/app
     networks:
       backend:
+
+  dwn-server:
+    image: ghcr.io/tbd54566975/dwn-server:main
+    container_name: dwn-server
+    ports:
+      - 3000:3000
+    volumes:
+      - ./dwn-data:/dwn-server/data
+    networks:
+      - backend
 
 networks:
   backend:

@@ -90,7 +90,9 @@ export default function ProfileWidget() {
           </div>
         </div>
 
-        <Button className="rounded-xl w-[80%] mt-6 mb-2">My Profile</Button>
+        <Button className="rounded-xl w-[80%] mt-6 mb-2 dark:bg-[#1d1d1d] dark:text-white">
+          My Profile
+        </Button>
       </CardContent>
     </Card>
   );

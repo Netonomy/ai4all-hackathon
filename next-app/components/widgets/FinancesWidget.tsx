@@ -12,7 +12,7 @@ export default function FinancesWidget() {
 
   return (
     <Card
-      className="  cursor-pointer rounded-2xl  w-[90%] max-w-[335px]"
+      className="  cursor-pointer rounded-2xl  w-[90%] max-w-[335px] max-h-[350px]"
       onClick={() => router.push("/finances")}
     >
       <CardContent className="flex flex-col items-center h-full gap-3">

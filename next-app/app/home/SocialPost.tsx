@@ -1,6 +1,11 @@
 import AvatarProfile from "@/components/AvatarProfile";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import useEventReactions from "@/hooks/nostr/useEventReactions";
 import useNostrProfile from "@/hooks/nostr/useNostrProfile";
@@ -61,8 +66,8 @@ export default function SocialPost({ event }: { event: Event<1 | 6 | 65003> }) {
   const numReactions = useEventReactions(event);
 
   return (
-    <Card className="p-5 mb-4 rounded-2xl">
-      <CardHeader>
+    <div className="p-3 w-full rounded-none shadow-none">
+      <div>
         <div className="flex items-center gap-4">
           <Avatar>
             {content && content.picture && (
@@ -83,10 +88,10 @@ export default function SocialPost({ event }: { event: Event<1 | 6 | 65003> }) {
             </p>
           </div>
         </div>
-      </CardHeader>
+      </div>
 
-      <CardContent className="w-full relative flex flex-col">
-        <p className="leading-7 [&:not(:first-child)]:mt-6 break-words">
+      <div className="w-full relative flex flex-col overflow-auto p-4 mt-2">
+        <p className="leading-7 [&:not(:first-child)]:mt-6 break-words max-w-[335px] xl:max-w-full max-h-[300px]  overflow-y-hidden">
           {renderContent(event.content)}
         </p>
 
@@ -105,7 +110,11 @@ export default function SocialPost({ event }: { event: Event<1 | 6 | 65003> }) {
             <Skeleton className="w-12 h-6" />
           )}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className=" flex items-center gap-2 w-full rounded-2xl mt-2">
+        <div className="border-b border-gray-300 w-full dark:bg-[#1d1d1d] dark:text-white dark:border-[#1d1d1d]"></div>
+      </div>
+    </div>
   );
 }

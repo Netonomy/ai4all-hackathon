@@ -2,6 +2,7 @@ import { Router } from "express";
 import { HumanMessage, AIMessage } from "langchain/schema";
 import { agentExecutor, dwn } from "../../../../config/web5AndAgentExecutor.js";
 import { authenticateToken } from "../../../../middleware/auth.middleware.js";
+import { L402Auth } from "../../../../middleware/l402.middlewate.js";
 
 /**
  * @swagger
@@ -9,7 +10,7 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  *   post:
  *     description: Chat with your AI Agent
  *     security:
- *       - bearerAuth: []
+ *       - macaroonAuth: []
  *     requestBody:
  *       required: true
  *       content:
@@ -20,6 +21,7 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  *               input:
  *                 type: string
  *                 required: true
+
  *     responses:
  *       200:
  *         description: OK
@@ -39,7 +41,8 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  */
 export default Router({ mergeParams: true }).post(
   "/v1/ai/chat",
-  // authenticateToken,
+  // L402Auth,
+  authenticateToken,
   async (req, res) => {
     try {
       const { input } = req.body;

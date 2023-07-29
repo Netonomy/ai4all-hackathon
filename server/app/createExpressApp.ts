@@ -30,6 +30,14 @@ const options = {
           type: "http",
           scheme: "bearer",
           bearerFormat: "JWT",
+          description:
+            "Bearer token to access api calls. Private to the API owner",
+        },
+        macaroonAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "Used for L402 payment authentications",
         },
       },
     },

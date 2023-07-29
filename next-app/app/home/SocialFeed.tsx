@@ -7,7 +7,7 @@ export default function SocialFeed() {
   const feed = useFeed();
 
   return (
-    <div className="h-full w-full">
+    <>
       {feed ? (
         feed.map((event) => <SocialPost key={event.id} event={event} />)
       ) : (
@@ -17,6 +17,6 @@ export default function SocialFeed() {
           ))}
         </>
       )}
-    </div>
+    </>
   );
 }

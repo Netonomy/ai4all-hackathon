@@ -51,7 +51,7 @@ export default function NavBar() {
             }
           : {}
       }
-      className="w-[90%] max-w-[335px] shadow-md rounded-lg mt-4"
+      className="w-[90%] max-w-[335px] shadow-md rounded-lg"
     >
       <Card className="">
         <CardContent>
@@ -96,7 +96,7 @@ export default function NavBar() {
               href="/data/passwords"
             />
 
-            <Button
+            {/* <Button
               variant={"ghost"}
               className="w-full flex flex-row items-center justify-start gap-2 font-bold"
               onClick={() => {
@@ -108,7 +108,7 @@ export default function NavBar() {
             >
               <LogOut />
               Logout
-            </Button>
+            </Button> */}
           </div>
         </CardContent>
       </Card>

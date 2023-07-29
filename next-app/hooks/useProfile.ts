@@ -55,6 +55,7 @@ export default function useProfile() {
           const blobUrl = URL.createObjectURL(blob);
 
           profile.banner = blobUrl;
+          console.log(profile.banner);
         }
 
         setProfile(profile);

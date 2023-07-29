@@ -13,12 +13,13 @@ export default function DataTopBar(props: {
   selecting?: boolean;
   setSelecting?: any;
   setSelectedItems?: any;
+  placeholder?: string;
 }) {
   return (
-    <div className="flex items-center w-[90%] lg:w-full ">
+    <div className="flex items-center   lg:w-full   ">
       <Input
         type="search"
-        placeholder="Search..."
+        placeholder={props.placeholder ? props.placeholder : "Search..."}
         className="shadow-md rounded-lg mr-2"
         value={props.searchText}
         onChange={(e) => props.setSearchText(e.target.value)}
