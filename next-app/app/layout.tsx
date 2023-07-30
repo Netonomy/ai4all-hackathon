@@ -8,7 +8,7 @@ import Providers from "./providers";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Netonomy Wallet",
+  title: "Netonomy",
   description: "Own your digtial identity, data, and finances",
   viewport: {
     width: "device-width",

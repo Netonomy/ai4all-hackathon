@@ -56,7 +56,7 @@ export default function useFeed() {
   }
 
   useEffect(() => {
-    getFeed();
+    // getFeed();
   }, [privateKeyHex]);
 
   return feed;

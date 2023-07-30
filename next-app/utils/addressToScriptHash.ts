@@ -1,9 +1,8 @@
-import config from "@/config";
 import { address as addr } from "bitcoinjs-lib";
 import crypto from "crypto";
 
 export function addressToScriptHash(address: string) {
-  const script = addr.toOutputScript(address, config.network);
+  const script = addr.toOutputScript(address);
   const scriptHash = crypto.createHash("sha256").update(script).digest();
   // Create a new buffer to store the reversed hash
   let reversedScriptHash = Buffer.alloc(scriptHash.length);

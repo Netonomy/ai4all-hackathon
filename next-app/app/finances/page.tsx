@@ -24,22 +24,18 @@ export default function FinancesPage() {
   const systemColor = useSystemTheme();
 
   const { profile } = useProfile();
-  const { btcWallet } = useWeb5();
 
   const [copied, setCopied] = useState(false);
 
   async function createAddressAndCopyToClipboard() {
-    const address = await btcWallet?.generateNewAddress(0);
-
-    if (address) {
-      navigator.clipboard.writeText(address).then(() => {
-        setCopied(true);
-
-        setTimeout(() => {
-          setCopied(false);
-        }, 5000);
-      });
-    }
+    // if (address) {
+    //   navigator.clipboard.writeText(address).then(() => {
+    //     setCopied(true);
+    //     setTimeout(() => {
+    //       setCopied(false);
+    //     }, 5000);
+    //   });
+    // }
   }
 
   return (

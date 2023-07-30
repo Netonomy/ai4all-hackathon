@@ -13,7 +13,7 @@ export default function SocialFeed() {
       ) : (
         <>
           {Array.from({ length: 10 }).map((_, i) => (
-            <Skeleton className="h-[300px] w-full mb-4 rounded-3xl" />
+            <Skeleton className="h-[300px] w-full mb-4 rounded-3xl" key={i} />
           ))}
         </>
       )}

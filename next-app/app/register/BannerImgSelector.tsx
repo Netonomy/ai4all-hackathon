@@ -3,7 +3,6 @@ import { Dispatch, SetStateAction, useCallback, useRef, useState } from "react";
 import Cropper from "react-easy-crop";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 
 export default function BannerImgSelector(props: {
   file: File | null;
@@ -130,10 +129,10 @@ export default function BannerImgSelector(props: {
         }}
       >
         {props.file && (
-          <Image
+          <img
             src={URL.createObjectURL(props.file)}
             alt="banner image"
-            fill
+            className="h-full w-full"
           />
         )}
       </div>

@@ -13,50 +13,50 @@ import { sideSheetOpenAtom } from "@/state/storage/sideSheetOpenAtom";
 import { tokenAtom } from "@/state/tokenAtom";
 
 export default function NavBar() {
-  const [selectedBtn, setSelectedBtn] = useState(
-    window.location.pathname.split("/")[3] || "files"
-  );
+  // const [selectedBtn, setSelectedBtn] = useState(
+  //   window.location.pathname.split("/")[3] || "files"
+  // );
   const [, setUserDetails] = useAtom(userDetailsAtom);
   const router = useRouter();
   const [, setSheetOpen] = useAtom(sideSheetOpenAtom);
   const [, setToken] = useAtom(tokenAtom);
 
-  const isLargeScreen = window.innerWidth > 1024;
+  // const isLargeScreen = window.innerWidth > 1024;
 
-  useEffect(() => {
-    const handlePathChange = () => {
-      // Logic to handle URL path change
-      setSelectedBtn(window.location.pathname.split("/")[3] || "files");
-    };
+  // useEffect(() => {
+  //   const handlePathChange = () => {
+  //     // Logic to handle URL path change
+  //     setSelectedBtn(window.location.pathname.split("/")[3] || "files");
+  //   };
 
-    // Add event listener for 'popstate' event
-    window.addEventListener("popstate", handlePathChange);
+  //   // Add event listener for 'popstate' event
+  //   window.addEventListener("popstate", handlePathChange);
 
-    // Cleanup function to remove the event listener
-    return () => {
-      window.removeEventListener("popstate", handlePathChange);
-    };
-  }, []);
+  //   // Cleanup function to remove the event listener
+  //   return () => {
+  //     window.removeEventListener("popstate", handlePathChange);
+  //   };
+  // }, []);
 
   return (
     <motion.div
-      initial={isLargeScreen ? { opacity: 0, x: -500, scale: 0.5 } : {}}
-      animate={{ opacity: 1, x: 0, scale: 1 }}
-      transition={
-        isLargeScreen
-          ? {
-              duration: 1,
-              delay: 0.2,
-              ease: [0, 0.71, 0.2, 1.01],
-            }
-          : {}
-      }
+      // initial={isLargeScreen ? { opacity: 0, x: -500, scale: 0.5 } : {}}
+      // animate={{ opacity: 1, x: 0, scale: 1 }}
+      // transition={
+      //   isLargeScreen
+      //     ? {
+      //         duration: 1,
+      //         delay: 0.2,
+      //         ease: [0, 0.71, 0.2, 1.01],
+      //       }
+      //     : {}
+      // }
       className="w-[90%] max-w-[335px] shadow-md rounded-lg"
     >
       <Card className="">
         <CardContent>
           <div className="flex flex-col items-center w-full gap-2">
-            <NavBarButton
+            {/* <NavBarButton
               icon={<File />}
               name="Files"
               selected={selectedBtn === "files"}
@@ -78,7 +78,7 @@ export default function NavBar() {
               selected={selectedBtn === "videos"}
               setSelected={setSelectedBtn}
               href="/data/videos"
-            />
+            /> */}
             {/* 
             <NavBarButton
               icon={<Headphones />}
@@ -88,13 +88,13 @@ export default function NavBar() {
               // href="/home/data"
             /> */}
 
-            <NavBarButton
+            {/* <NavBarButton
               icon={<LockIcon />}
               name="Passwords"
               selected={selectedBtn === "passwords"}
               setSelected={setSelectedBtn}
               href="/data/passwords"
-            />
+            /> */}
 
             {/* <Button
               variant={"ghost"}

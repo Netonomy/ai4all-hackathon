@@ -3,7 +3,7 @@ services:
   server:
     build:
       context: server
-      dockerfile: Dockerfile.local
+      dockerfile: Dockerfile
     ports:
       - 3300:3300
     environment:
@@ -13,21 +13,17 @@ services:
       - SERPAPI_API_KEY=${SERPAPI_API_KEY}
       - TOKEN_SECRET=${TOKEN_SECRET}
       - LND_ENDPOINT=${LND_ENDPOINT}
-    volumes:
-      - ./server:/usr/src/app
     networks:
       backend:
 
   pwa:
     build:
       context: ./next-app
-      dockerfile: Dockerfile.local
+      dockerfile: Dockerfile
       args:
         - NEXT_PUBLIC_API_URL=http://localhost:3300/api
     ports:
       - 4000:4000
-    volumes:
-      - ./next-app:/usr/src/app
     networks:
       backend:
 

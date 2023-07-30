@@ -6,6 +6,7 @@ const withPWA = require("next-pwa")({
 });
 
 const nextConfig = {
+  // output: "standalone",
   images: {
     remotePatterns: [
       {
@@ -14,22 +15,22 @@ const nextConfig = {
       },
     ],
   },
-  webpack: (config, { isServer }) => {
-    // Fixes npm packages that depend on `fs` module
-    if (!isServer) {
-      config.resolve.fallback = {
-        ...config.resolve.fallback, // if you miss it, all the other options in fallback, specified
-        // by next.js will be dropped. Doesn't make much sense, but how it is
-        fs: false, // the solution
-        module: false,
-        perf_hooks: false,
-      };
-    }
+  // webpack: (config, { isServer }) => {
+  // Fixes npm packages that depend on `fs` module
+  // if (!isServer) {
+  //   config.resolve.fallback = {
+  //     ...config.resolve.fallback, // if you miss it, all the other options in fallback, specified
+  //     // by next.js will be dropped. Doesn't make much sense, but how it is
+  //     fs: false, // the solution
+  //     module: false,
+  //     perf_hooks: false,
+  //   };
+  // }
 
-    config.experiments = { asyncWebAssembly: true , layers: true};
+  // config.experiments = { asyncWebAssembly: true , layers: true};
 
-    return config;
-  },
+  //   return config;
+  // },
 };
 
 module.exports = withPWA(nextConfig);

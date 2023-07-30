@@ -1,13 +1,20 @@
 FROM node:18.16.0
+
+# Declare build arguments
+ARG NEXT_PUBLIC_API_URL
+# Set environment variables
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+
 WORKDIR /usr/src/app
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json and package-lock.json are copied
 COPY package*.json ./
 
-RUN npm install --legacy-peer-deps
+RUN npm install
 
 # Bundle app source
 COPY . .
-EXPOSE 3300
+
+EXPOSE 4000 
 CMD ["npm", "run", "dev"]

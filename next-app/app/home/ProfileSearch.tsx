@@ -39,7 +39,10 @@ export default function ProfileSearch() {
               {profiles &&
                 profiles.length > 0 &&
                 profiles.map((profile) => (
-                  <div className="flex items-center gap-2 rounded hover:opacity-90 cursor-pointer">
+                  <div
+                    className="flex items-center gap-2 rounded hover:opacity-90 cursor-pointer"
+                    key={profile.id}
+                  >
                     <Avatar>
                       <AvatarImage src={JSON.parse(profile.content).picture} />
                     </Avatar>

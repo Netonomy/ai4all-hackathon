@@ -1,10 +1,9 @@
-import { BtcWallet } from "@/lib/BtcWallet";
-// import { Web5 } from "@tbd54566975/web5/browser";
-import { Web5 } from "@tbd54566975/web5";
+import { Web5 } from "@tbd54566975/web5/browser";
+// import { Web5 } from "@tbd54566975/web5";
 import { useEffect, useState } from "react";
 
 export default function useWeb5() {
-  const [web5, setWeb5] = useState<Web5 | null>(null);
+  const [web5, setWeb5] = useState<any | null>(null);
   const [did, setDid] = useState<string | null>(null);
 
   async function connect() {
