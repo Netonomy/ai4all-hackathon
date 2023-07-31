@@ -1,16 +1,11 @@
 import { Router } from "express";
-import {
-  closeChannel,
-  createInvoice,
-  getChainBalance,
-  getChannels,
-} from "lightning";
+import { openChannel } from "lightning";
 import { lnd } from "../../../../config/lndClient.js";
 import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
- * /api/v1/lightning/createInvoice:
+ * /api/v1/lightning/openChannel:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -21,7 +16,10 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  *           schema:
  *             type: object
  *             properties:
- *               mtokens:
+ *               local_tokens:
+ *                 type: number
+ *                 required: true
+ *               partner_public_key:
  *                 type: string
  *                 required: true
  *     responses:
@@ -31,15 +29,19 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  *       - lightning
  */
 export default Router({ mergeParams: true }).post(
-  "/v1/lightning/createInvoice",
-  authenticateToken,
+  "/v1/lightning/openChannel",
+  //   authenticateToken,
   async (req, res) => {
     try {
-      const { mtokens } = req.body;
+      const { local_tokens, partner_public_key } = req.body;
 
-      const invoice = await createInvoice({ lnd, tokens: 50000 });
+      const channel = await openChannel({
+        lnd,
+        local_tokens,
+        partner_public_key,
+      });
 
-      res.json(invoice);
+      res.json(channel);
     } catch (err: any) {
       console.error(err);
       res.status(400).json({

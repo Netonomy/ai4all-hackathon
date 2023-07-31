@@ -1,11 +1,11 @@
 import { Router } from "express";
-import { getChainBalance, getChannels } from "lightning";
+import { getChainBalance, getChannels, getPendingChannels } from "lightning";
 import { lnd } from "../../../../config/lndClient.js";
 import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
- * /api/v1/lightning/openChannels:
+ * /api/v1/lightning/pendingChannels:
  *   get:
  *     security:
  *       - bearerAuth: []
@@ -27,11 +27,11 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  *       - lightning
  */
 export default Router({ mergeParams: true }).get(
-  "/v1/lightning/openChannels",
+  "/v1/lightning/pendingChannels",
   // authenticateToken,
   async (req, res) => {
     try {
-      const channels = (await getChannels({ lnd })).channels;
+      const channels = (await getPendingChannels({ lnd })).pending_channels;
 
       res.json(channels);
     } catch (err: any) {

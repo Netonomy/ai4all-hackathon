@@ -28,7 +28,7 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  */
 export default Router({ mergeParams: true }).post(
   "/v1/bitcoin/generateNewAddress",
-  authenticateToken,
+  // authenticateToken,
   async (req, res) => {
     try {
       const format = "p2wpkh";

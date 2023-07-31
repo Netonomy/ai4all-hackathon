@@ -28,7 +28,7 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  */
 export default Router({ mergeParams: true }).get(
   "/v1/bitcoin/balance",
-  authenticateToken,
+  // authenticateToken,
   async (req, res) => {
     try {
       const balance = (await getChainBalance({ lnd })).chain_balance;

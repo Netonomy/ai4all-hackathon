@@ -1,16 +1,11 @@
 import { Router } from "express";
-import {
-  closeChannel,
-  createInvoice,
-  getChainBalance,
-  getChannels,
-} from "lightning";
+import { payViaPaymentRequest } from "lightning";
 import { lnd } from "../../../../config/lndClient.js";
 import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 
 /**
  * @swagger
- * /api/v1/lightning/createInvoice:
+ * /api/v1/lightning/payViaPaymentRequest:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -21,9 +16,10 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  *           schema:
  *             type: object
  *             properties:
- *               mtokens:
+ *               request:
  *                 type: string
  *                 required: true
+ *                 description: bol11 payment request string
  *     responses:
  *       200:
  *         description: OK
@@ -31,15 +27,15 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
  *       - lightning
  */
 export default Router({ mergeParams: true }).post(
-  "/v1/lightning/createInvoice",
-  authenticateToken,
+  "/v1/lightning/payViaPaymentRequest",
+  //   authenticateToken,
   async (req, res) => {
     try {
-      const { mtokens } = req.body;
+      const { request } = req.body;
 
-      const invoice = await createInvoice({ lnd, tokens: 50000 });
+      const response = await payViaPaymentRequest({ lnd, request });
 
-      res.json(invoice);
+      res.json(response);
     } catch (err: any) {
       console.error(err);
       res.status(400).json({
