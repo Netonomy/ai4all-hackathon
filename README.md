@@ -1,24 +1,24 @@
-# Netonomy: Become your own Server
+# Netonomy:
 
 Netonomy aims to help people and organizations take control of their digital identity, data and finances.
 
 ## 🤯 Features
 
-- ⚡️ Lightning node
 - 💽 Decentralized Web Node
 - 🕸️ Nostr Client
-- 💻 Your own Server and API
-- 🤝 LNURL
 - 🤖 Autonomous Agent
+
+### 📜 Requirements
+
+1. WebLN + Nostr Enabled Wallet
+
+### 🎥 Demo
+
+https://www.loom.com/share/6714ff4fe0c944909278e252e2159e14
 
 ## 🏛️ Architecture
 
 ![Architecture Diagram](./docs/images/Blank%20diagram.png)
-
-## 📖 Documentation
-
-1. 🎬 [Setup](./docs/setup.md)
-2. 📡 [API Docs](http://localhost:3300/api-docs)
 
 ## License
 
