@@ -177,7 +177,7 @@ export default function Chat() {
                   🔥 Publish Job for Nostr Events Feed
                 </Button>
 
-                <Button
+                {/* <Button
                   onClick={() => {
                     sendMessage(
                       "Get the current weather forecast for virginia."
@@ -185,7 +185,7 @@ export default function Chat() {
                   }}
                 >
                   ☁️ Weather forecast in VA
-                </Button>
+                </Button> */}
               </div>
             </>
           )}

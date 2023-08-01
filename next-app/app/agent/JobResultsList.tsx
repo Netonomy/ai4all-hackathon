@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { pool, relays } from "@/config";
 import { Lightbulb, Loader2, Zap } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Event } from "nostr-tools";
+import { Event, relayInit } from "nostr-tools";
 import { useEffect, useState } from "react";
 
 export default function JobResultsList({ jobEventId }: { jobEventId: string }) {
@@ -11,7 +11,11 @@ export default function JobResultsList({ jobEventId }: { jobEventId: string }) {
   const [results, setResults] = useState<any[]>([]);
 
   async function getJobResults() {
-    const pubs = pool.sub(relays, [
+    const relay = relayInit("wss://relay.damus.io");
+
+    await relay.connect();
+
+    const pubs = relay.sub([
       {
         kinds: [65001],
         "#e": [jobEventId],
@@ -19,8 +23,13 @@ export default function JobResultsList({ jobEventId }: { jobEventId: string }) {
     ]);
 
     pubs.on("event", (event) => {
+      console.log(event);
       // Check if event.id is not already in the results array
-      if (!results.some((result) => result.id === event.id)) {
+      if (
+        !results.some(
+          (result) => result.id === event.id && result.content === event.content
+        )
+      ) {
         // Update the results array by adding the new event
         setResults((prevResults) => [...prevResults, event]);
       }
@@ -29,6 +38,22 @@ export default function JobResultsList({ jobEventId }: { jobEventId: string }) {
     // pubs.on("eose", () => {
     //   pool.close(relays);
     // });
+  }
+
+  function removeDuplicates(results: any) {
+    const uniqueResults: any = [];
+    const labels: string[] = [];
+
+    for (const result of results) {
+      const labeTag = result.tags.find((tag) => tag[0] === "t");
+
+      if (!labels.includes(labeTag[1])) {
+        labels.push(labeTag[1]);
+        uniqueResults.push(result);
+      }
+    }
+
+    return uniqueResults;
   }
 
   useEffect(() => {
@@ -48,7 +73,7 @@ export default function JobResultsList({ jobEventId }: { jobEventId: string }) {
           </div>
         ) : (
           <div className="flex items-center gap-3">
-            {results.map((result: Event) => {
+            {removeDuplicates(results).map((result: Event) => {
               const amountTag = result.tags.find((tag) => tag[0] === "amount");
               const amount = amountTag ? parseInt(amountTag[1]) / 1000 : 0;
 

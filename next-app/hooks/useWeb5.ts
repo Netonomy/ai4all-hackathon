@@ -9,7 +9,7 @@ export default function useWeb5() {
   async function connect() {
     const { web5, did } = await Web5.connect({
       techPreview: {
-        dwnEndpoints: ["http://localhost:3000"],
+        dwnEndpoints: [],
       },
     });
 

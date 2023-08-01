@@ -10,6 +10,7 @@ import {
   getPublicKey,
   getSignature,
   nip19,
+  relayInit,
 } from "nostr-tools";
 import { useEffect, useState } from "react";
 
@@ -18,7 +19,11 @@ export default function useFeed(eventId: string) {
   const [pubkey] = useAtom(pubKeyAtom);
 
   async function getFeed() {
-    const event = await pool.get(relays, {
+    const relay = relayInit("wss://relay.damus.io");
+
+    await relay.connect();
+
+    const event = await relay.get({
       ids: [eventId],
     });
 
