@@ -11,4 +11,3 @@ MESSAGESTORE/
 files/
 *.macaroon
 *.cert
-package-lock.json
