@@ -94,7 +94,7 @@ export async function getTrendingEvents(): Promise<Event[]> {
     });
 
     sub.on("eose", async () => {
-      events = events.slice(0, 25); // Testing purposes
+      // events = events.slice(0, 25); // Testing purposes
       for (const event of events) {
         const reactions = await pool.list(
           relays,
@@ -175,8 +175,8 @@ sub.on("event", async (event) => {
     },
   ]);
 
-  console.log("BTC events");
-  console.log(btcEvents);
+  // console.log("BTC events");
+  // console.log(btcEvents);
 
   let bitcoinTopicsJobResult: any = {
     kind: 65001,
