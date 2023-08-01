@@ -3,6 +3,7 @@ import {
   getEventHash,
   getPublicKey,
   getSignature,
+  relayInit,
   validateEvent,
   verifySignature,
 } from "nostr-tools";
@@ -120,7 +121,11 @@ export async function getTrendingEvents(): Promise<Event[]> {
   });
 }
 
-const sub = pool.sub(relays, [
+const relay = relayInit("wss://relay.damus.io");
+
+await relay.connect();
+
+const sub = relay.sub([
   {
     kinds: [65006],
     since: moment().subtract(2, "minutes").unix(),
