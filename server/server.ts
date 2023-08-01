@@ -127,80 +127,86 @@ const sub = pool.sub(relays, [
   },
 ]);
 
+let finishedRequests: string[] = [];
+
 sub.on("event", async (event) => {
   console.log("FULLFILLING JOB REQUEST");
 
-  // Job 1: Trending Events
+  if (!finishedRequests.includes(event.id)) {
+    // Job 1: Trending Events
 
-  const invoice = await createInvoice({ lnd, mtokens: "100000" });
+    const invoice = await createInvoice({ lnd, mtokens: "100000" });
 
-  let jobResultEvent: any = {
-    kind: 65001,
-    content: JSON.stringify(eventsCache),
-    tags: [
-      ["e", event.id],
-      ["p", event.pubkey],
-      ["s", "success"],
-      ["request", JSON.stringify(event)],
-      ["amount", "100000", invoice.request],
-      ["t", "🔥 Trending Events"],
-    ],
-    pubkey: pk,
-    created_at: Math.floor(Date.now() / 1000),
-  };
+    let jobResultEvent: any = {
+      kind: 65001,
+      content: JSON.stringify(eventsCache),
+      tags: [
+        ["e", event.id],
+        ["p", event.pubkey],
+        ["s", "success"],
+        ["request", JSON.stringify(event)],
+        ["amount", "100000", invoice.request],
+        ["t", "🔥 Trending Events"],
+      ],
+      pubkey: pk,
+      created_at: Math.floor(Date.now() / 1000),
+    };
 
-  jobResultEvent.id = getEventHash(jobResultEvent);
-  jobResultEvent.sig = getSignature(jobResultEvent, sk);
+    jobResultEvent.id = getEventHash(jobResultEvent);
+    jobResultEvent.sig = getSignature(jobResultEvent, sk);
 
-  let ok = validateEvent(jobResultEvent);
-  let veryOk = verifySignature(jobResultEvent);
+    let ok = validateEvent(jobResultEvent);
+    let veryOk = verifySignature(jobResultEvent);
 
-  let pubs = pool.publish(relays, jobResultEvent);
+    let pubs = pool.publish(relays, jobResultEvent);
 
-  pubs.on("ok", () => {
-    console.log("published okay");
-  });
-  pubs.on("failed", () => {
-    console.log("Failed to publish job result");
-  });
+    pubs.on("ok", () => {
+      console.log("published okay");
+    });
+    pubs.on("failed", () => {
+      console.log("Failed to publish job result");
+    });
 
-  // Job 2: Bitcoin
-  const invoice2 = await createInvoice({ lnd, mtokens: "300000" });
+    // Job 2: Bitcoin
+    const invoice2 = await createInvoice({ lnd, mtokens: "300000" });
 
-  const btcEvents = await pool.list(relays, [
-    {
-      kinds: [1],
-      "#t": ["bitcoin", "btc", "₿"],
-      limit: 50,
-    },
-  ]);
+    const btcEvents = await pool.list(relays, [
+      {
+        kinds: [1],
+        "#t": ["bitcoin", "btc", "₿"],
+        limit: 50,
+      },
+    ]);
 
-  // console.log("BTC events");
-  // console.log(btcEvents);
+    // console.log("BTC events");
+    // console.log(btcEvents);
 
-  let bitcoinTopicsJobResult: any = {
-    kind: 65001,
-    content: JSON.stringify(btcEvents),
-    tags: [
-      ["e", event.id],
-      ["p", event.pubkey],
-      ["s", "success"],
-      ["request", JSON.stringify(event)],
-      ["amount", "300000", invoice2.request],
-      ["t", "₿ Bitcoin"],
-    ],
-    pubkey: pk,
-    created_at: Math.floor(Date.now() / 1000),
-  };
-  bitcoinTopicsJobResult.id = getEventHash(bitcoinTopicsJobResult);
-  bitcoinTopicsJobResult.sig = getSignature(bitcoinTopicsJobResult, sk);
+    let bitcoinTopicsJobResult: any = {
+      kind: 65001,
+      content: JSON.stringify(btcEvents),
+      tags: [
+        ["e", event.id],
+        ["p", event.pubkey],
+        ["s", "success"],
+        ["request", JSON.stringify(event)],
+        ["amount", "300000", invoice2.request],
+        ["t", "₿ Bitcoin"],
+      ],
+      pubkey: pk,
+      created_at: Math.floor(Date.now() / 1000),
+    };
+    bitcoinTopicsJobResult.id = getEventHash(bitcoinTopicsJobResult);
+    bitcoinTopicsJobResult.sig = getSignature(bitcoinTopicsJobResult, sk);
 
-  let pubs2 = pool.publish(relays, bitcoinTopicsJobResult);
+    let pubs2 = pool.publish(relays, bitcoinTopicsJobResult);
 
-  pubs2.on("ok", () => {
-    console.log("published okay");
-  });
-  pubs2.on("failed", () => {
-    console.log("Failed to publish job result");
-  });
+    pubs2.on("ok", () => {
+      console.log("published okay");
+    });
+    pubs2.on("failed", () => {
+      console.log("Failed to publish job result");
+    });
+
+    finishedRequests.push(event.id);
+  }
 });
