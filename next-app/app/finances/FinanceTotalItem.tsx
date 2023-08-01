@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Skeleton } from "../../components/ui/skeleton";
 import axiosInstance from "@/config/axiosInstance";
 import { useQuery } from "@tanstack/react-query";
+import useChannelBalanceQuery from "@/react-query/useChannelBalanceQuery";
 
 export default function FinanceTotalItem() {
   const balanceQuery = useQuery(
@@ -18,13 +19,15 @@ export default function FinanceTotalItem() {
     }
   );
 
+  const channelBalanceQuery = useChannelBalanceQuery();
+
   const [balance, setBalance] = useAtom(balanceAtom);
 
   const [leading, setLeading] = useState("");
   const [actual, setActual] = useState("");
 
   async function formatBalance() {
-    let balance = balanceQuery.data;
+    let balance = balanceQuery.data + channelBalanceQuery.data.channel_balance;
 
     if (balance) {
       const satsString = balance.toString().padStart(9, "0");
@@ -64,8 +67,8 @@ export default function FinanceTotalItem() {
   }
 
   useEffect(() => {
-    if (balanceQuery.data) formatBalance();
-  }, [balanceQuery.isLoading]);
+    if (balanceQuery.data && channelBalanceQuery.data) formatBalance();
+  }, [balanceQuery.isLoading, channelBalanceQuery.isLoading]);
 
   return (
     <>

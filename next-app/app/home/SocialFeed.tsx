@@ -3,8 +3,8 @@ import useFeed from "@/hooks/nostr/useFeed";
 import SocialPost from "./SocialPost";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function SocialFeed() {
-  const feed = useFeed();
+export default function SocialFeed({ eventId }: { eventId: string }) {
+  const feed = useFeed(eventId);
 
   return (
     <>

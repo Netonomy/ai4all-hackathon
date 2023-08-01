@@ -10,9 +10,11 @@ import { CheckCircle, CopyIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import Image from "next/image";
+import useNostrPosts from "@/hooks/nostr/useNostrPosts";
 
 export default function ProfileWidget() {
   const { profile, bannerImg } = useProfile();
+  const posts = useNostrPosts();
 
   const [copied, setCopied] = useState(false);
 
@@ -31,9 +33,9 @@ export default function ProfileWidget() {
       <CardContent className="h-full flex items-center justify-center gap-2 lg:gap-2 lg:flex-col">
         <div className="w-full relative mb-10 mt-2">
           <div className="w-full h-28">
-            {bannerImg ? (
+            {profile?.banner ? (
               <Image
-                src={URL.createObjectURL(bannerImg)}
+                src={profile.banner}
                 alt="banner"
                 fill
                 className="rounded-3xl"
@@ -78,24 +80,24 @@ export default function ProfileWidget() {
           <Skeleton className="h-6 w-[150px]" />
         )}
 
-        <div className="w-[80%] flex items-center justify-around mt-6">
+        <div className="w-[80%] flex items-center justify-around mt-4">
           <div className="flex flex-col items-center">
-            <div className="text-lg font-semibold">250</div>
+            <div className="text-lg font-semibold">{posts.length}</div>
             <p className="text-sm text-muted-foreground">Post</p>
           </div>
 
-          <div className="flex flex-col items-center">
+          {/* <div className="flex flex-col items-center">
             <div className="text-lg font-semibold">100</div>
             <p className="text-sm text-muted-foreground">Followers</p>
-          </div>
+          </div> */}
 
           <div className="flex flex-col items-center">
-            <div className="text-lg font-semibold">210</div>
-            <p className="text-sm text-muted-foreground">Following</p>
+            <div className="text-lg font-semibold">0</div>
+            <p className="text-sm text-muted-foreground">Contacts</p>
           </div>
         </div>
 
-        <Button className="rounded-xl w-[80%] mt-6 mb-2 dark:bg-[#1d1d1d] dark:text-white">
+        <Button className="rounded-xl w-[80%] mt-4 mb-2 dark:bg-[#1d1d1d] dark:text-white">
           My Profile
         </Button>
       </CardContent>

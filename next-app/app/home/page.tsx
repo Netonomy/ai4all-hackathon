@@ -20,9 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import DataTopBar from "@/components/DataTopBar";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import Chat from "../agent/Chat";
 
 export default function Home() {
   const router = useRouter();
@@ -31,11 +32,13 @@ export default function Home() {
     <div className="flex flex-1 w-full flex-row items-center mb-4">
       <div className="w-0 h-0 hidden flex-col items-center  lg:flex lg:h-full  lg:w-[30%] gap-6">
         <ProfileWidget />
-        <FinancesWidget />
+        {/* <FinancesWidget /> */}
       </div>
 
-      <div className="w-full h-full flex flex-col items-center lg:w-[40%] xl:w-[41%] overflow-y-auto max-h-[calc(100vh)]">
-        <div className="mt-[90px] w-[98%] md:w-full z-40">
+      <div className="w-full h-full flex flex-col items-center lg:w-[40%] xl:w-[41%] overflow-y-auto">
+        <Chat />
+
+        {/* <div className="mt-[90px] w-[98%] md:w-full z-40">
           <DataTopBar
             placeholder="Share something..."
             searchText={""}
@@ -43,9 +46,21 @@ export default function Home() {
             uploadBtnAccept="*"
             onFilesSelected={async (files: FileList) => {}}
           />
-        </div>
+        </div> */}
 
-        <div className="flex items-center gap-2 my-2 w-full">
+        {/* <div className="mt-[90px] w-[98%] md:w-full z-40 flex flex-col">
+          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight mb-6">
+            Data Vending Machines
+          </h3>
+
+          <Card className="w-[150px] h-[150px]">
+            <CardContent className="w-full h-full flex items-center justify-center">
+              <CardTitle>🔥 Trending</CardTitle>
+            </CardContent>
+          </Card>
+        </div> */}
+
+        {/* <div className="flex items-center gap-2 my-2 w-full">
           <div className="border-b border-gray-300 w-full dark:border-[#1d1d1d]"></div>
 
           <Select defaultValue="trending">
@@ -54,7 +69,6 @@ export default function Home() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="trending">🔥 Trending</SelectItem>
-              <SelectItem value="following">💛 Following</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -63,7 +77,7 @@ export default function Home() {
           <CardContent className="flex flex-1 flex-col items-center w-full overflow-y-auto overflow-x-visible">
             <SocialFeed />
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
 
       <div className="w-0 h-0 hidden flex-col items-center  lg:flex lg:h-full  lg:w-[30%] gap-6">

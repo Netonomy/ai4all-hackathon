@@ -6,6 +6,7 @@ import useProfile from "@/hooks/useProfile";
 
 export default function AvatarProfile() {
   const { profile } = useProfile();
+  
   return (
     <Avatar className="h-full w-full">
       {profile?.picture && <AvatarImage src={profile.picture} />}

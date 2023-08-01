@@ -63,7 +63,7 @@ export default function SocialPost({ event }: { event: Event<1 | 6 | 65003> }) {
   const profile = useNostrProfile(event.pubkey);
   const content = profile ? JSON.parse(profile.content) : null;
 
-  const numReactions = useEventReactions(event);
+  // const numReactions = useEventReactions(event);
 
   return (
     <div className="p-3 w-full rounded-none shadow-none">
@@ -91,24 +91,20 @@ export default function SocialPost({ event }: { event: Event<1 | 6 | 65003> }) {
       </div>
 
       <div className="w-full relative flex flex-col overflow-auto p-4 mt-2">
-        <p className="leading-7 [&:not(:first-child)]:mt-6 break-words max-w-[335px] xl:max-w-full max-h-[300px]  overflow-y-hidden">
+        <p className="leading-7 [&:not(:first-child)]:mt-6 break-words max-w-[335px] xl:max-w-full  overflow-y-hidden">
           {renderContent(event.content)}
         </p>
 
         <div className="mt-6">
-          {numReactions ? (
-            <div className="flex items-center gap-1">
-              <div className="cursor-pointer">
-                <HeartIcon />
-              </div>
-
-              <small className="text-sm font-medium leading-none">
-                {numReactions}
-              </small>
+          <div className="flex items-center gap-1">
+            <div className="cursor-pointer">
+              <HeartIcon />
             </div>
-          ) : (
-            <Skeleton className="w-12 h-6" />
-          )}
+
+            <small className="text-sm font-medium leading-none">
+              {(event as any).reactionCount}
+            </small>
+          </div>
         </div>
       </div>
 

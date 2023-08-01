@@ -51,14 +51,12 @@ import BannerImgSelector from "./BannerImgSelector";
 const schema = yup
   .object({
     name: yup.string().required(),
-    macaroon: yup.string().required(),
     about: yup.string().optional(),
   })
   .required();
 
 type FormData = {
   name: string;
-  macaroon: string;
   about: string | undefined;
 };
 
@@ -69,7 +67,7 @@ export default function Register() {
   const [readInfo, setReadInfo] = useState(false);
   const [showReadInfoError, setShowReadInfoError] = useState(false);
 
-  const [incorrectMacaroon, setIncorrectMacaroon] = useState(false);
+  // const [incorrectMacaroon, setIncorrectMacaroon] = useState(false);
 
   const login = useLogin();
   const [loading, setLoading] = useAtom(loadingAtom);
@@ -86,112 +84,110 @@ export default function Register() {
   const onSubmit = handleSubmit(async (data) => {
     setLoading(true);
     try {
-      login.mutate(data.macaroon, {
-        onError: () => {
-          setLoading(false);
-          setIncorrectMacaroon(true);
-        },
-        onSuccess: async (res) => {
-          // Store api access token
-          const token = res.data.bearerToken;
-          setToken(token);
-          axiosInstance.defaults.headers.common[
-            "Authorization"
-          ] = `Bearer ${token}`;
+      // Store api access token
+      // const token = res.data.bearerToken;
+      // setToken(token);
+      // axiosInstance.defaults.headers.common[
+      //   "Authorization"
+      // ] = `Bearer ${token}`;
 
-          // store profile img in dwn
-          let profileImgRecordId = "";
-          if (profileImg) {
-            const { record } = await web5!.dwn.records.create({
-              data: profileImg,
-              message: {
-                dataFormat: "image/png",
-              },
-            });
+      // store profile img in dwn
+      let profileImgRecordId = "";
+      if (profileImg) {
+        const { record } = await web5!.dwn.records.create({
+          data: profileImg,
+          message: {
+            dataFormat: "image/png",
+          },
+        });
 
-            if (record) {
-              profileImgRecordId = record.id;
-            }
-          }
+        if (record) {
+          profileImgRecordId = record.id;
+        }
+      }
 
-          // store banner img in dwn
-          let bannerImgRecordId = "";
-          if (bannerImg) {
-            const { record } = await web5!.dwn.records.create({
-              data: bannerImg,
-              message: {
-                dataFormat: "image/png",
-              },
-            });
+      // store banner img in dwn
+      let bannerImgRecordId = "";
+      if (bannerImg) {
+        const { record } = await web5!.dwn.records.create({
+          data: bannerImg,
+          message: {
+            dataFormat: "image/png",
+          },
+        });
 
-            if (record) {
-              bannerImgRecordId = record.id;
-            }
-          }
+        if (record) {
+          bannerImgRecordId = record.id;
+        }
+      }
 
-          // Generate keys and ION DID
-          let authnKeys = await generateKeyPair();
-          let did = new DID({
-            content: {
-              publicKeys: [
-                {
-                  id: "key-1",
-                  type: "EcdsaSecp256k1VerificationKey2019",
-                  publicKeyJwk: authnKeys.publicJwk,
-                  purposes: ["authentication"],
-                },
-              ],
-              services: [],
-            },
-          });
+      // Generate keys and ION DID
+      // let authnKeys = await generateKeyPair();
+      // let did = new DID({
+      //   content: {
+      //     publicKeys: [
+      //       {
+      //         id: "key-1",
+      //         type: "EcdsaSecp256k1VerificationKey2019",
+      //         publicKeyJwk: authnKeys.publicJwk,
+      //         purposes: ["authentication"],
+      //       },
+      //     ],
+      //     services: [],
+      //   },
+      // });
 
-          // Store the key material and source data of all operations that have been created for the DID
-          let ionOps = await did.getAllOperations();
-          ionOps.push({
-            macaroon: data.macaroon,
-          });
+      // // Store the key material and source data of all operations that have been created for the DID
+      // let ionOps = await did.getAllOperations();
+      // ionOps.push({
+      //   macaroon: data.macaroon,
+      // });
 
-          setProfileString(JSON.stringify(ionOps));
+      const pubkey = await (window as any).nostr.getPublicKey();
+      console.log(pubkey);
 
-          const privateKeyBase64 = ionOps[0].recovery.privateJwk.d;
-          const buffer = Buffer.from(privateKeyBase64, "base64");
-          const hexPrivateKey = buffer.toString("hex");
+      // setProfileString(JSON.stringify(ionOps));
 
-          setPrivateKeyHex(hexPrivateKey);
+      // const privateKeyBase64 = ionOps[0].recovery.privateJwk.d;
+      // const buffer = Buffer.from(privateKeyBase64, "base64");
+      // const hexPrivateKey = buffer.toString("hex");
 
-          const pubKey = getPublicKey(hexPrivateKey);
+      // setPrivateKeyHex(hexPrivateKey);
 
-          let event: any = {
-            kind: 0,
-            pubkey: pubKey,
-            created_at: Math.floor(Date.now() / 1000),
-            tags: [],
-            content: JSON.stringify({
-              name: data.name,
-              about: data.about,
-              picture: profileImgRecordId, // TODO: update to dwn url
-              banner: bannerImgRecordId, // TODO: update to dwn url
-            }),
-          };
-          event.id = getEventHash(event);
-          event.sig = getSignature(event, hexPrivateKey);
+      // const pubKey = getPublicKey(hexPrivateKey);
 
-          console.log(event);
+      let event: any = {
+        kind: 0,
+        pubkey: pubkey,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: [],
+        content: JSON.stringify({
+          name: data.name,
+          about: data.about,
+          picture: profileImgRecordId, // TODO: update to dwn url
+          banner: bannerImgRecordId, // TODO: update to dwn url
+        }),
+      };
+      event.id = getEventHash(event);
 
-          let pubs = pool.publish(relays, event as Event);
-          pubs.on("ok", (type) => {
-            console.log(type);
-            // this may be called multiple times, once for every relay that accepts the event
-            console.log(`Relay has accepted our event`);
-          });
-          pubs.on("failed", (relay, reason) => {
-            console.log(`failed to publish to ${relay}: ${reason}`);
-          });
+      const signedEvent = await (window as any).nostr.signEvent(event);
 
-          setShowDownloadDialog(true);
-          setLoading(false);
-        },
+      console.log("signed event");
+      console.log(signedEvent);
+
+      let pubs = pool.publish(relays, signedEvent);
+
+      pubs.on("ok", (type) => {
+        console.log(type);
+        // this may be called multiple times, once for every relay that accepts the event
+        console.log(`Relay has accepted our event`);
       });
+      pubs.on("failed", (relay, reason) => {
+        console.log(`failed to publish to ${relay}: ${reason}`);
+      });
+
+      router.push("/home");
+      setLoading(false);
     } catch (err) {
       console.error(err);
       setLoading(false);
@@ -230,7 +226,7 @@ export default function Register() {
             {...register("about")}
           />
 
-          <Input
+          {/* <Input
             placeholder="LND Macaroon"
             className="shadow-md"
             {...register("macaroon")}
@@ -245,7 +241,7 @@ export default function Register() {
             <small className="text-xs font-medium leading-none text-red-600 text-center">
               Invalid Macaroon
             </small>
-          )}
+          )} */}
         </div>
 
         <Button className="m-6 w-80" type="submit">

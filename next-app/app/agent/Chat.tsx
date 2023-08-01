@@ -1,27 +1,13 @@
-"use client";
-import AiChatTextArea from "@/components/AiChatTextArea";
-import PageContainer from "@/components/containers/PageContainer";
 import { Bot, CheckCircle } from "lucide-react";
 import { Fragment, useState } from "react";
-import BackBtn from "@/components/BackBtn";
-import { Button } from "@/components/ui/button";
 import AgentAction from "./AgentAction";
-import KeyLogo from "@/components/KeyLogo";
-import { useAtom } from "jotai";
+import AiChatTextArea from "@/components/AiChatTextArea";
 import { loadingAtom } from "@/state/loadingAtom";
-import { Badge } from "@/components/ui/badge";
+import { useAtom } from "jotai";
 import AvatarProfile from "@/components/AvatarProfile";
-import { tokenAtom } from "@/state/tokenAtom";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { useRouter } from "next/navigation";
-import Header from "../Header";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { messagesAtom } from "@/state/messagesAtom";
 
 interface HumanMessage {
   type: "human";
@@ -51,15 +37,13 @@ function parseAuthenticateHeader(header) {
   }, {});
 }
 
-export default function AgentPage() {
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [, setLoading] = useAtom(loadingAtom);
-  const [token, setToken] = useAtom(tokenAtom);
-  const router = useRouter();
+export default function Chat() {
+  const [messages, setMessages] = useAtom(messagesAtom);
   const [message, setMessage] = useState("");
+  const [, setLoading] = useAtom(loadingAtom);
 
-  async function sendMessage() {
-    if (message === "") return;
+  async function sendMessage(messageToSend: string) {
+    if (messageToSend === "") return;
     setLoading(true);
     let reader;
     const decoder = new TextDecoder("utf-8");
@@ -76,7 +60,7 @@ export default function AgentPage() {
       ...prevMessages,
       {
         type: "human",
-        message,
+        message: messageToSend,
       },
     ]);
     setMessage("");
@@ -88,7 +72,7 @@ export default function AgentPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          input: message,
+          input: messageToSend,
           messages: messageHistory,
         }),
       }).then(async (response) => {
@@ -109,7 +93,7 @@ export default function AgentPage() {
                 Authorization: `L402 ${parsed["L402 macaroon"]}:${preimage}`,
               },
               body: JSON.stringify({
-                input: message,
+                input: messageToSend,
                 messages: messageHistory,
               }),
             }).then((response) => {
@@ -172,91 +156,102 @@ export default function AgentPage() {
   }
 
   return (
-    <PageContainer>
-      <Header
-        showBackBtn
-        rightSideComponents={
-          messages.length > 0
-            ? [
-                <Badge
-                  onClick={() => setMessages([])}
-                  className="cursor-pointer"
-                  key={"badge-reset"}
-                >
-                  Reset Chat
-                </Badge>,
-              ]
-            : []
-        }
-      />
-
-      <div className="absolute inset-0 flex items-center justify-center -z-10">
-        <div className="relative flex flex-col items-center gap-4 w-[500px]">
+    <div className="flex flex-1 w-full relative z-60">
+      <div className="absolute inset-0 flex items-center justify-center z-50">
+        <div className="relative flex flex-col items-center gap-8 w-[500px]">
           {messages.length === 0 && (
-            <h3 className="scroll-m-20 text-4xl font-semibold tracking-tight flex items-center gap-3 ">
-              <CheckCircle height={30} width={30} className="text-green-600" />
-              Ready to Chat
-            </h3>
+            <>
+              <h3 className="scroll-m-20 text-4xl font-semibold tracking-tight flex items-center gap-3 ">
+                🤖 Ready to chat
+              </h3>
+
+              <div className="flex items-center gap-4">
+                <Button
+                  onClick={() => {
+                    sendMessage(
+                      "Publish an event to nostr for a trending events feed, then get the job result."
+                    );
+                  }}
+                >
+                  🔥 Get Trending Nostr Events
+                </Button>
+
+                <Button
+                  onClick={() => {
+                    sendMessage(
+                      "Get the current weather forecast for virginia."
+                    );
+                  }}
+                >
+                  ☁️ Weather forecast in VA
+                </Button>
+              </div>
+            </>
           )}
         </div>
       </div>
 
-      <div className="flex flex-1 flex-col items-center w-full max-w-[1000px] relative overflow-y-auto">
-        <div className="flex flex-1 flex-col items-center w-full max-w-[1000px] relative overflow-y-auto">
-          <div className="h-[90%] w-full p-4 flex  overflow-y-auto flex-col-reverse">
-            {messages
-              .slice()
-              .reverse()
-              .map((message, i) => (
-                <Fragment key={i}>
-                  {message.type === "human" && (
-                    <div className={` ml-auto flex gap-2 items-end`}>
-                      <div className="whitespace-pre-wrap bg-blue-500 text-white rounded-xl inline-block my-2 p-3">
-                        {message.message}
-                      </div>
+      {messages.length > 0 && (
+        <div className="flex flex-1 flex-col items-center w-full max-w-[1000px] relative overflow-y-auto z-50 ">
+          <div className="flex flex-1 flex-col items-center w-full max-w-[1000px]  relative overflow-y-auto z-50">
+            <div
+              className="h-[100%] w-full p-4 flex  overflow-y-auto flex-col-reverse"
+              style={{ maxHeight: "90vh" }}
+            >
+              {messages
+                .slice()
+                .reverse()
+                .map((message, i) => (
+                  <Fragment key={i}>
+                    {message.type === "human" && (
+                      <div className={` ml-auto flex gap-2 items-end`}>
+                        <div className="whitespace-pre-wrap bg-blue-500 text-white rounded-xl inline-block my-2 p-3">
+                          {message.message}
+                        </div>
 
-                      <div className="min-h-[35px] min-w-[35px] max-h-[35px] max-w-[35px] mb-3">
-                        <AvatarProfile />
+                        <div className="min-h-[35px] min-w-[35px] max-h-[35px] max-w-[35px] mb-3">
+                          <AvatarProfile />
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {message.type === "ai" && (
-                    <div className="mr-auto flex gap-2 items-end">
-                      <div className="min-h-[35px] min-w-[35px] max-h-[35px] max-w-[35px] mb-3">
-                        <Bot />
-                      </div>
+                    )}
+                    {message.type === "ai" && (
+                      <div className="mr-auto flex gap-2 items-end">
+                        <div className="min-h-[35px] min-w-[35px] max-h-[35px] max-w-[35px] mb-3">
+                          <Bot />
+                        </div>
 
-                      <div
-                        className={`my-2 p-3 rounded-2xl inline-block bg-slate-400 text-white mr-auto whitespace-pre-wrap`}
-                      >
-                        {message.message}
+                        <div
+                          className={`my-2 p-3 rounded-2xl inline-block bg-slate-400 text-white mr-auto whitespace-pre-wrap`}
+                        >
+                          {message.message}
+                        </div>
                       </div>
-                    </div>
-                  )}
-                  {message.type === "aiAction" && (
-                    <div className="mr-auto flex gap-2 items-end">
-                      <div className="min-h-[35px] min-w-[35px] max-h-[35px] max-w-[35px] mb-3" />
-                      <div className={`my-2 inline-block text-white mr-auto`}>
-                        <AgentAction action={message} />
+                    )}
+                    {message.type === "aiAction" && (
+                      <div className="mr-auto flex gap-2 items-end">
+                        <div className="min-h-[35px] min-w-[35px] max-h-[35px] max-w-[35px] mb-3" />
+                        <div className={`my-2 inline-block text-white mr-auto`}>
+                          <AgentAction action={message} />
+                        </div>
                       </div>
-                    </div>
-                  )}
-                </Fragment>
-              ))}
+                    )}
+                  </Fragment>
+                ))}
+            </div>
           </div>
         </div>
+      )}
 
-        <div className="absolute bottom-2 w-full p-2 lg:bottom-6">
-          <AiChatTextArea
-            input={message}
-            setInput={setMessage}
-            disabled={false}
-            onSend={() => {
-              sendMessage();
-            }}
-          />
-        </div>
+      <div className="absolute bottom-0 w-full p-2 lg:bottom-0 z-50">
+        <AiChatTextArea
+          input={message}
+          setInput={setMessage}
+          disabled={false}
+          onSend={() => {
+            sendMessage(message);
+          }}
+        />
       </div>
-    </PageContainer>
+    </div>
   );
 }

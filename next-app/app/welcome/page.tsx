@@ -20,6 +20,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { getPublicKey } from "nostr-tools";
 import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
+import { pool, relays } from "@/config";
+import { isLoggedInAtom } from "@/state/user/isLoggedIn";
+import { firstLoginAtom } from "@/state/user/firstLogIn";
 
 export default function Welcome() {
   const [macaroon, setMacaroon] = useState("");
@@ -28,8 +31,10 @@ export default function Welcome() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useAtom(loadingAtom);
   const [, setPrivateKey] = useAtom(privateKeyHexAtom);
+  const [, setLoggedIn] = useAtom(isLoggedInAtom);
 
   const [showLoginDialog, setShowLoginDialog] = useState(false);
+  const [firstLogIn, setFIrstlogin] = useAtom(firstLoginAtom);
 
   const login = useLogin();
 
@@ -52,19 +57,42 @@ export default function Welcome() {
         <div className="flex flex-col items-center justify-center gap-4">
           <Button
             className="w-80"
-            onClick={() => {
-              setShowLoginDialog(true);
+            onClick={async () => {
+              // setShowLoginDialog(true);
+              try {
+                if (typeof (window as any).webln !== "undefined") {
+                  await (window as any).webln.enable();
+
+                  const pubkey = await (window as any).nostr.getPublicKey();
+
+                  const profile = await pool.get(relays, {
+                    kinds: [0],
+                    authors: [pubkey],
+                  });
+
+                  if (!profile) {
+                    setFIrstlogin(false);
+                    router.push("/register");
+                  } else {
+                    setLoggedIn(true);
+                    router.push("/home");
+                  }
+                }
+              } catch (error) {
+                // User denied permission or cancelled
+                console.log(error);
+              }
             }}
             disabled={loading}
           >
-            Import Profile
+            Login
           </Button>
 
-          <Link href={"/register"}>
+          {/* <Link href={"/register"}>
             <Button variant={"ghost"} className="w-80">
               Create Profile
             </Button>
-          </Link>
+          </Link> */}
         </div>
       </div>
 

@@ -5,10 +5,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import { AiAction } from "./page";
-import { Loader, Loader2 } from "lucide-react";
+import { CheckCircle, Loader, Loader2 } from "lucide-react";
 import QRCode from "react-qr-code";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import SocialFeed from "../home/SocialFeed";
 
 export default function AgentAction({ action }: { action: AiAction }) {
   const [showCopiedMessage, setShowCopiedMessage] = useState(false);
@@ -121,6 +123,57 @@ export default function AgentAction({ action }: { action: AiAction }) {
                   {action.toolResponse}
                 </div>
               )}
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      );
+    }
+    case "nostr-algo-feed-job-request": {
+      return (
+        <div className="flex gap-2 items-center">
+          <div className="bg-slate-900 p-3 rounded-xl">
+            {action.inProgress ? (
+              <div className="mr-1 flex items-center">
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Publishing Job to Nostr
+              </div>
+            ) : (
+              <div className="mr-1 flex items-center gap-2">
+                <CheckCircle />
+                Published Job.
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+    case "nostr-job-results": {
+      return (
+        <Accordion
+          type="single"
+          collapsible
+          className="rounded-xl bg-slate-900"
+        >
+          <AccordionItem value="item-1" className="border-b-0 ">
+            <AccordionTrigger className="p-2 hover:no-underline">
+              {action.inProgress ? (
+                <div className="mr-1 flex items-center">
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Getting Job Results
+                </div>
+              ) : (
+                <div className="mr-1 flex items-center gap-2">
+                  <CheckCircle />
+                  Events Feed
+                </div>
+              )}
+            </AccordionTrigger>
+            <AccordionContent className="pl-2 pr-2 ml-6 mr-2 max-w-[500px]">
+              {action.toolResponse && (
+                <SocialFeed eventId={JSON.parse(action.toolResponse)[0]} />
+              )}
+
+              {action.toolResponse}
             </AccordionContent>
           </AccordionItem>
         </Accordion>

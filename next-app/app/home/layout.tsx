@@ -13,7 +13,7 @@ export default function HomeLayout({
       <PageContainer>
         <Header />
 
-        <AgentChatBtn />
+        {/* <AgentChatBtn /> */}
 
         {children}
       </PageContainer>

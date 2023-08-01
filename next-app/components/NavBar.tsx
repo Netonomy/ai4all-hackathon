@@ -56,29 +56,29 @@ export default function NavBar() {
       <Card className="">
         <CardContent>
           <div className="flex flex-col items-center w-full gap-2">
-            {/* <NavBarButton
+            <NavBarButton
               icon={<File />}
               name="Files"
-              selected={selectedBtn === "files"}
-              setSelected={setSelectedBtn}
+              selected={true}
+              setSelected={null}
               href="/data"
             />
 
             <NavBarButton
               icon={<Image />}
               name="Photos"
-              selected={selectedBtn === "photos"}
-              setSelected={setSelectedBtn}
+              selected={false}
+              setSelected={null}
               href="/data/photos"
             />
 
             <NavBarButton
               icon={<Video />}
               name="Videos"
-              selected={selectedBtn === "videos"}
-              setSelected={setSelectedBtn}
+              selected={false}
+              setSelected={null}
               href="/data/videos"
-            /> */}
+            />
             {/* 
             <NavBarButton
               icon={<Headphones />}
@@ -86,9 +86,9 @@ export default function NavBar() {
               selected={selectedBtn === "audio"}
               setSelected={setSelectedBtn}
               // href="/home/data"
-            /> */}
+            />
 
-            {/* <NavBarButton
+            <NavBarButton
               icon={<LockIcon />}
               name="Passwords"
               selected={selectedBtn === "passwords"}

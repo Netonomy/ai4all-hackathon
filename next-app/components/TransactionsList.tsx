@@ -39,9 +39,9 @@ export default function TransactionsList() {
               >
                 <div className="relative h-7 w-7 lg:h-10 lg:w-10">
                   {transaction.is_outgoing ? (
-                    <Image src={"/depositIcon.svg"} alt="deposit" fill />
-                  ) : (
                     <Image src={"/withdrawIcon.svg"} alt="withdraw" fill />
+                  ) : (
+                    <Image src={"/depositIcon.svg"} alt="deposit" fill />
                   )}
                 </div>
 
@@ -62,8 +62,8 @@ export default function TransactionsList() {
                   <small
                     className={`text-sm font-medium leading-none ${
                       transaction.is_outgoing
-                        ? "text-[#27AE60]"
-                        : "text-[#AE2727]"
+                        ? "text-[#AE2727]"
+                        : "text-[#27AE60]"
                     }`}
                   >
                     {transaction.tokens} sats

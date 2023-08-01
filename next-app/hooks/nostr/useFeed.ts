@@ -12,52 +12,68 @@ import {
 } from "nostr-tools";
 import { useEffect, useState } from "react";
 
-export default function useFeed() {
-  const [feed, setFeed] = useAtom(feedAtom);
-  const [privateKeyHex] = useAtom(privateKeyHexAtom);
+export default function useFeed(eventId: string) {
+  const [feed, setFeed] = useState<any[]>([]);
 
   async function getFeed() {
-    if (privateKeyHex) {
-      const pubKey = getPublicKey(privateKeyHex!);
+    await (window as any).webln.enable();
+    const pubkey = await (window as any).nostr.getPublicKey();
+    console.log(pubkey);
 
-      // Create Job Request for algorithmic feed
-      let jobRequestEvent: any = {
-        kind: 65006,
-        pubkey: pubKey,
-        created_at: Math.floor(Date.now() / 1000),
-        tags: [["output", "application/json"]],
-        content: "",
-      };
-      jobRequestEvent.id = getEventHash(jobRequestEvent);
-      jobRequestEvent.sig = getSignature(jobRequestEvent, privateKeyHex);
+    const event = await pool.get(relays, {
+      ids: [eventId],
+    });
 
-      // Publish Job
-      let pubs = pool.publish(relays, jobRequestEvent);
-      pubs.on("ok", () => {
-        console.log("published okay");
-      });
-      pubs.on("failed", () => {
-        console.log("Failed to publish job result");
-      });
+    console.log(event);
 
-      // Wait data vending machine response
-      let jobResponsePubs = pool.sub(relays, [
-        {
-          "#e": [jobRequestEvent.id],
-          kinds: [65001],
-        },
-      ]);
+    if (event) {
+      const events = JSON.parse(event.content);
 
-      jobResponsePubs.on("event", (event) => {
-        const eventsFeed = JSON.parse(event.content);
-        setFeed(eventsFeed);
-      });
+      setFeed(events);
     }
+
+    // // Create Job Request for algorithmic feed
+    // let jobRequestEvent: any = {
+    //   kind: 65006,
+    //   pubkey: pubkey,
+    //   created_at: Math.floor(Date.now() / 1000),
+    //   tags: [["output", "application/json"]],
+    //   content: "",
+    // };
+    // console.log(jobRequestEvent);
+    // jobRequestEvent.id = getEventHash(jobRequestEvent);
+    // // jobRequestEvent.sig = getSignature(jobRequestEvent, privateKeyHex);
+
+    // // const msg = await (window as any).webln.signMessage(jobRequestEvent);
+    // // console.log(msg);
+    // // jobRequestEvent.sig = msg.signature;
+
+    // // Publish Job
+    // let pubs = pool.publish(relays, jobRequestEvent);
+    // pubs.on("ok", () => {
+    //   console.log("published okay");
+    // });
+    // pubs.on("failed", () => {
+    //   console.log("Failed to publish job result");
+    // });
+
+    // // Wait data vending machine response
+    // let jobResponsePubs = pool.sub(relays, [
+    //   {
+    //     "#e": [jobRequestEvent.id],
+    //     kinds: [65001],
+    //   },
+    // ]);
+
+    // jobResponsePubs.on("event", (event) => {
+    //   const eventsFeed = JSON.parse(event.content);
+    //   setFeed(eventsFeed);
+    // });
   }
 
   useEffect(() => {
-    // getFeed();
-  }, [privateKeyHex]);
+    getFeed();
+  }, []);
 
   return feed;
 }

@@ -16,7 +16,7 @@ export default function DataWidget() {
       <CardHeader className="pl-4 pt-3">
         <CardTitle>Storage</CardTitle>
       </CardHeader>
-      <CardContent className="flex flex-col max-h-[400px] w-full overflow-y-auto">
+      <CardContent className="flex flex-col max-h-[700px] w-full overflow-y-auto">
         <FilesList searchText="" />
       </CardContent>
     </Card>
