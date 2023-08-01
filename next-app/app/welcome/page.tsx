@@ -70,7 +70,7 @@ export default function Welcome() {
                     authors: [pubkey],
                   });
 
-                  if (!profile) {
+                  if (!profile || firstLogIn) {
                     setFIrstlogin(false);
                     router.push("/register");
                   } else {

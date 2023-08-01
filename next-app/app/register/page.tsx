@@ -47,6 +47,7 @@ import axiosInstance from "@/config/axiosInstance";
 import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
 import { pool, relays } from "@/config";
 import BannerImgSelector from "./BannerImgSelector";
+import { isLoggedInAtom } from "@/state/user/isLoggedIn";
 
 const schema = yup
   .object({
@@ -73,6 +74,7 @@ export default function Register() {
   const [loading, setLoading] = useAtom(loadingAtom);
   const [, setToken] = useAtom(tokenAtom);
   const [, setPrivateKeyHex] = useAtom(privateKeyHexAtom);
+  const [, setIsLoggedin] = useAtom(isLoggedInAtom);
 
   const {
     register,
@@ -186,6 +188,7 @@ export default function Register() {
         console.log(`failed to publish to ${relay}: ${reason}`);
       });
 
+      setIsLoggedin(true);
       router.push("/home");
       setLoading(false);
     } catch (err) {

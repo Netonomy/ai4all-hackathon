@@ -13,9 +13,7 @@ import { sideSheetOpenAtom } from "@/state/storage/sideSheetOpenAtom";
 import { tokenAtom } from "@/state/tokenAtom";
 
 export default function NavBar() {
-  // const [selectedBtn, setSelectedBtn] = useState(
-  //   window.location.pathname.split("/")[3] || "files"
-  // );
+  const [selectedBtn, setSelectedBtn] = useState("files");
   const [, setUserDetails] = useAtom(userDetailsAtom);
   const router = useRouter();
   const [, setSheetOpen] = useAtom(sideSheetOpenAtom);
@@ -59,24 +57,24 @@ export default function NavBar() {
             <NavBarButton
               icon={<File />}
               name="Files"
-              selected={true}
-              setSelected={null}
+              selected={selectedBtn === "files"}
+              setSelected={setSelectedBtn}
               href="/data"
             />
 
             <NavBarButton
               icon={<Image />}
               name="Photos"
-              selected={false}
-              setSelected={null}
+              selected={selectedBtn === "photos"}
+              setSelected={setSelectedBtn}
               href="/data/photos"
             />
 
             <NavBarButton
               icon={<Video />}
               name="Videos"
-              selected={false}
-              setSelected={null}
+              selected={selectedBtn === "videos"}
+              setSelected={setSelectedBtn}
               href="/data/videos"
             />
             {/* 

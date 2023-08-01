@@ -9,7 +9,7 @@ import { CheckCircle, Loader, Loader2 } from "lucide-react";
 import QRCode from "react-qr-code";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
+
 import SocialFeed from "../home/SocialFeed";
 
 export default function AgentAction({ action }: { action: AiAction }) {
@@ -172,8 +172,6 @@ export default function AgentAction({ action }: { action: AiAction }) {
               {action.toolResponse && (
                 <SocialFeed eventId={JSON.parse(action.toolResponse)[0]} />
               )}
-
-              {action.toolResponse}
             </AccordionContent>
           </AccordionItem>
         </Accordion>
