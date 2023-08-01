@@ -151,7 +151,7 @@ sub.on("event", async (event) => {
         ["p", event.pubkey],
         ["s", "success"],
         ["request", JSON.stringify(event)],
-        ["amount", "100000", invoice.request],
+        ["amount", "1000", invoice.request],
         ["t", "🔥 Trending Events"],
       ],
       pubkey: pk,
@@ -164,7 +164,7 @@ sub.on("event", async (event) => {
     let ok = validateEvent(jobResultEvent);
     let veryOk = verifySignature(jobResultEvent);
 
-    let pubs = pool.publish(relays, jobResultEvent);
+    let pubs = relay.publish(jobResultEvent);
 
     pubs.on("ok", (relay: any) => {
       console.log("published okay");
@@ -196,7 +196,7 @@ sub.on("event", async (event) => {
         ["p", event.pubkey],
         ["s", "success"],
         ["request", JSON.stringify(event)],
-        ["amount", "300000", invoice2.request],
+        ["amount", "3000", invoice2.request],
         ["t", "₿ Bitcoin"],
       ],
       pubkey: pk,
@@ -205,7 +205,7 @@ sub.on("event", async (event) => {
     bitcoinTopicsJobResult.id = getEventHash(bitcoinTopicsJobResult);
     bitcoinTopicsJobResult.sig = getSignature(bitcoinTopicsJobResult, sk);
 
-    let pubs2 = pool.publish(relays, bitcoinTopicsJobResult);
+    let pubs2 = relay.publish(bitcoinTopicsJobResult);
 
     pubs2.on("ok", () => {
       console.log("published okay");
