@@ -128,7 +128,9 @@ const sub = pool.sub(relays, [
 ]);
 
 sub.on("event", async (event) => {
-  console.log(event);
+  console.log("FULLFILLING JOB REQUEST");
+
+  // Job 1: Trending Events
 
   const invoice = await createInvoice({ lnd, mtokens: "100000" });
 
@@ -141,6 +143,7 @@ sub.on("event", async (event) => {
       ["s", "success"],
       ["request", JSON.stringify(event)],
       ["amount", "100000", invoice.request],
+      ["t", "🔥 Trending Events"],
     ],
     pubkey: pk,
     created_at: Math.floor(Date.now() / 1000),
@@ -149,13 +152,8 @@ sub.on("event", async (event) => {
   jobResultEvent.id = getEventHash(jobResultEvent);
   jobResultEvent.sig = getSignature(jobResultEvent, sk);
 
-  console.log(jobResultEvent);
-
   let ok = validateEvent(jobResultEvent);
   let veryOk = verifySignature(jobResultEvent);
-
-  console.log(ok);
-  console.log(veryOk);
 
   let pubs = pool.publish(relays, jobResultEvent);
 
@@ -163,6 +161,46 @@ sub.on("event", async (event) => {
     console.log("published okay");
   });
   pubs.on("failed", () => {
+    console.log("Failed to publish job result");
+  });
+
+  // Job 2: Bitcoin
+  const invoice2 = await createInvoice({ lnd, mtokens: "300000" });
+
+  const btcEvents = await pool.list(relays, [
+    {
+      kinds: [1],
+      "#t": ["bitcoin", "btc", "₿"],
+      limit: 50,
+    },
+  ]);
+
+  console.log("BTC events");
+  console.log(btcEvents);
+
+  let bitcoinTopicsJobResult: any = {
+    kind: 65001,
+    content: JSON.stringify(btcEvents),
+    tags: [
+      ["e", event.id],
+      ["p", event.pubkey],
+      ["s", "success"],
+      ["request", JSON.stringify(event)],
+      ["amount", "300000", invoice2.request],
+      ["t", "₿ Bitcoin"],
+    ],
+    pubkey: pk,
+    created_at: Math.floor(Date.now() / 1000),
+  };
+  bitcoinTopicsJobResult.id = getEventHash(bitcoinTopicsJobResult);
+  bitcoinTopicsJobResult.sig = getSignature(bitcoinTopicsJobResult, sk);
+
+  let pubs2 = pool.publish(relays, bitcoinTopicsJobResult);
+
+  pubs2.on("ok", () => {
+    console.log("published okay");
+  });
+  pubs2.on("failed", () => {
     console.log("Failed to publish job result");
   });
 });

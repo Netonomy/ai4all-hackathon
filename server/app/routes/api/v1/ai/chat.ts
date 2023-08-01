@@ -57,7 +57,7 @@ async function publishJob(): Promise<string> {
     let pubs = pool.publish(relays, jobRequestEvent);
     pubs.on("ok", () => {
       console.log("published okay");
-      resolve(JSON.stringify(jobRequestEvent));
+      resolve(jobRequestEvent.id);
     });
     pubs.on("failed", () => {
       console.log("Failed to publish job result");
@@ -151,22 +151,22 @@ export default Router({ mergeParams: true }).post(
             return jobRes;
           },
         }),
-        new DynamicStructuredTool({
-          name: "nostr-job-results",
-          description:
-            "Useful when you want to get job results of a published job. Returns a list of event ids.",
-          schema: z.object({
-            eventId: z.string().describe("nostr job event id"),
-          }),
-          func: async ({ eventId }) => {
-            const events = await getJobDetails(eventId);
-            return events;
-          },
-        }),
+        // new DynamicStructuredTool({
+        //   name: "nostr-job-results",
+        //   description:
+        //     "Useful when you want to get job results of a published job. Returns a list of event ids.",
+        //   schema: z.object({
+        //     eventId: z.string().describe("nostr job event id"),
+        //   }),
+        //   func: async ({ eventId }) => {
+        //     const events = await getJobDetails(eventId);
+        //     return events;
+        //   },
+        // }),
       ];
-      // if (process.env.SERPAPI_API_KEY) {
-      //   tools.push(new SerpAPI());
-      // }
+      if (process.env.SERPAPI_API_KEY) {
+        tools.push(new SerpAPI());
+      }
 
       const chat = new ChatOpenAI({
         modelName: "gpt-3.5-turbo-0613",
