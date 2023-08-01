@@ -11,6 +11,8 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 
 import SocialFeed from "../home/SocialFeed";
+import { Card, CardContent } from "@/components/ui/card";
+import JobResultsList from "./JobResultsList";
 
 export default function AgentAction({ action }: { action: AiAction }) {
   const [showCopiedMessage, setShowCopiedMessage] = useState(false);
@@ -138,9 +140,15 @@ export default function AgentAction({ action }: { action: AiAction }) {
                 Publishing Job to Nostr
               </div>
             ) : (
-              <div className="mr-1 flex items-center gap-2">
-                <CheckCircle />
-                Published Job.
+              <div className="flex flex-col items-center gap-2">
+                <div className="mr-1 flex items-center gap-2">
+                  <CheckCircle />
+                  Published Job.
+                </div>
+
+                {action.toolResponse && (
+                  <JobResultsList jobEventId={action.toolResponse!} />
+                )}
               </div>
             )}
           </div>

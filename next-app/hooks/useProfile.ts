@@ -8,19 +8,19 @@ import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
 import { Profile } from "@/types/Profile";
 import { pool, relays } from "@/config";
 import { profileAtom } from "@/state/user/profileAtom";
+import { pubKeyAtom } from "@/state/user/pubKeyAtom";
 
 export default function useProfile() {
   const [profile, setProfile] = useAtom(profileAtom);
   const { web5 } = useWeb5();
   // const [privateKey] = useAtom(privateKeyHexAtom);
   const [bannerImg, setBannerImg] = useState<Blob | null>(null);
+  const [profileImg, setProfileImg] = useState<Blob | null>(null);
+  const [pubkey, setPubkey] = useAtom(pubKeyAtom);
 
   async function getProfile() {
-    if (web5) {
+    if (web5 && pubkey) {
       try {
-        await (window as any).webln.enable();
-        const pubkey = await (window as any).nostr.getPublicKey();
-
         const npub = nip19.npubEncode(pubkey);
 
         const sub = pool.sub(relays, [
@@ -48,6 +48,8 @@ export default function useProfile() {
                 const blobUrl = URL.createObjectURL(blob);
 
                 profile.picture = blobUrl;
+
+                setProfileImg(blob);
               }
             }
 
@@ -80,7 +82,7 @@ export default function useProfile() {
 
   useEffect(() => {
     getProfile();
-  }, [web5]);
+  }, [web5, pubkey]);
 
-  return { profile, bannerImg };
+  return { profile, bannerImg, profileImg };
 }

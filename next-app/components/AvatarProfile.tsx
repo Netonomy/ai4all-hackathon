@@ -5,11 +5,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import useProfile from "@/hooks/useProfile";
 
 export default function AvatarProfile() {
-  const { profile } = useProfile();
-  
+  const { profile, profileImg } = useProfile();
+
   return (
     <Avatar className="h-full w-full">
-      {profile?.picture && <AvatarImage src={profile.picture} />}
+      {profileImg && <AvatarImage src={URL.createObjectURL(profileImg)} />}
       <AvatarFallback>
         <Skeleton className="h-full w-full rounded-full" />
       </AvatarFallback>

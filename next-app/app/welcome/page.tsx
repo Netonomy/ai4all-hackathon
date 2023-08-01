@@ -23,6 +23,7 @@ import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
 import { pool, relays } from "@/config";
 import { isLoggedInAtom } from "@/state/user/isLoggedIn";
 import { firstLoginAtom } from "@/state/user/firstLogIn";
+import { pubKeyAtom } from "@/state/user/pubKeyAtom";
 
 export default function Welcome() {
   const [macaroon, setMacaroon] = useState("");
@@ -35,6 +36,7 @@ export default function Welcome() {
 
   const [showLoginDialog, setShowLoginDialog] = useState(false);
   const [firstLogIn, setFIrstlogin] = useAtom(firstLoginAtom);
+  const [, setPubkey] = useAtom(pubKeyAtom);
 
   const login = useLogin();
 
@@ -62,8 +64,9 @@ export default function Welcome() {
               try {
                 if (typeof (window as any).webln !== "undefined") {
                   await (window as any).webln.enable();
-
                   const pubkey = await (window as any).nostr.getPublicKey();
+
+                  setPubkey(pubkey);
 
                   const profile = await pool.get(relays, {
                     kinds: [0],

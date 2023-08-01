@@ -33,9 +33,9 @@ export default function ProfileWidget() {
       <CardContent className="h-full flex items-center justify-center gap-2 lg:gap-2 lg:flex-col">
         <div className="w-full relative mb-10 mt-2">
           <div className="w-full h-28">
-            {profile?.banner ? (
+            {bannerImg ? (
               <Image
-                src={profile.banner}
+                src={URL.createObjectURL(bannerImg)}
                 alt="banner"
                 fill
                 className="rounded-3xl"

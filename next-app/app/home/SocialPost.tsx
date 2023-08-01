@@ -25,6 +25,11 @@ function NostrLink({ pubKey }) {
   );
 }
 
+function canDecode(str) {
+  const allowedChars = "qpzry9x8gf2tvdw0s3jn54khce6mua7l";
+  return str.split("").every((char) => allowedChars.includes(char));
+}
+
 function renderContent(content) {
   const lines = content.split("\n");
   return lines.map((line, index) => {
@@ -44,9 +49,12 @@ function renderContent(content) {
         );
       }
       if (/^nostr:npub/.test(word)) {
-        return (
-          <NostrLink key={idx} pubKey={nip19.decode(word.split("nostr:")[1])} />
-        );
+        const decodedString = word.split("nostr:")[1];
+        if (canDecode(decodedString)) {
+          return <NostrLink key={idx} pubKey={nip19.decode(decodedString)} />;
+        } else {
+          return word + " ";
+        }
       }
       return word + " ";
     });

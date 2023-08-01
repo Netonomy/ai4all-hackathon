@@ -82,6 +82,7 @@ export default function Chat() {
           );
 
           try {
+            await (window as any).webln.enable();
             const { preimage } = await (window as any).webln.sendPayment(
               parsed.invoice
             );
@@ -169,14 +170,14 @@ export default function Chat() {
                 <Button
                   onClick={() => {
                     sendMessage(
-                      "Publish an event to nostr for a trending events feed, then get the job result."
+                      "Publish an event to nostr for a trending events feed."
                     );
                   }}
                 >
-                  🔥 Get Trending Nostr Events
+                  🔥 Publish Job for Nostr Events Feed
                 </Button>
 
-                {/* <Button
+                <Button
                   onClick={() => {
                     sendMessage(
                       "Get the current weather forecast for virginia."
@@ -184,7 +185,7 @@ export default function Chat() {
                   }}
                 >
                   ☁️ Weather forecast in VA
-                </Button> */}
+                </Button>
               </div>
             </>
           )}

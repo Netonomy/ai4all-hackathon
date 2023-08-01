@@ -1,6 +1,7 @@
 import { pool, relays } from "@/config";
 import { privateKeyHexAtom } from "@/state/privatekeyHexAtom";
 import { feedAtom } from "@/state/social/feedAtom";
+import { pubKeyAtom } from "@/state/user/pubKeyAtom";
 import { useAtom } from "jotai";
 import {
   Event,
@@ -14,17 +15,12 @@ import { useEffect, useState } from "react";
 
 export default function useFeed(eventId: string) {
   const [feed, setFeed] = useState<any[]>([]);
+  const [pubkey] = useAtom(pubKeyAtom);
 
   async function getFeed() {
-    await (window as any).webln.enable();
-    const pubkey = await (window as any).nostr.getPublicKey();
-    console.log(pubkey);
-
     const event = await pool.get(relays, {
       ids: [eventId],
     });
-
-    console.log(event);
 
     if (event) {
       const events = JSON.parse(event.content);
@@ -73,7 +69,7 @@ export default function useFeed(eventId: string) {
 
   useEffect(() => {
     getFeed();
-  }, []);
+  }, [eventId]);
 
   return feed;
 }

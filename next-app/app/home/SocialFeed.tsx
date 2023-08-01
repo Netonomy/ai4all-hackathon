@@ -7,7 +7,7 @@ export default function SocialFeed({ eventId }: { eventId: string }) {
   const feed = useFeed(eventId);
 
   return (
-    <>
+    <div className="flex flex-1 w-full overflow-y-auto flex-col items-center max-h-[calc(100vh-90px)] mt-[90px]">
       {feed ? (
         feed.map((event) => <SocialPost key={event.id} event={event} />)
       ) : (
@@ -17,6 +17,6 @@ export default function SocialFeed({ eventId }: { eventId: string }) {
           ))}
         </>
       )}
-    </>
+    </div>
   );
 }
