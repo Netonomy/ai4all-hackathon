@@ -4,7 +4,6 @@ import { authenticateToken } from "../../../../middleware/auth.middleware.js";
 import {
   DynamicStructuredTool,
   DynamicTool,
-  SerpAPI,
   StructuredTool,
   Tool,
 } from "langchain/tools";
@@ -164,9 +163,9 @@ export default Router({ mergeParams: true }).post(
         //   },
         // }),
       ];
-      if (process.env.SERPAPI_API_KEY) {
-        tools.push(new SerpAPI());
-      }
+      // if (process.env.SERPAPI_API_KEY) {
+      //   tools.push(new SerpAPI());
+      // }
 
       const chat = new ChatOpenAI({
         modelName: "gpt-3.5-turbo-0613",
