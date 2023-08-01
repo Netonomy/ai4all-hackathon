@@ -42,7 +42,7 @@ export async function L402Auth(
 }
 
 async function createAndSendMacaroonAndInvoice(res: Response) {
-  const invoice = await createInvoice({ lnd, tokens: 100 });
+  const invoice = await createInvoice({ lnd, tokens: 10 });
 
   const macaroon = Macaroon.newMacaroon({
     version: 1,

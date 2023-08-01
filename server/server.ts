@@ -141,7 +141,7 @@ sub.on("event", async (event) => {
     finishedRequests.push(event.id);
     // Job 1: Trending Events
 
-    const invoice = await createInvoice({ lnd, mtokens: "100000" });
+    const invoice = await createInvoice({ lnd, mtokens: "1000" });
 
     let jobResultEvent: any = {
       kind: 65001,
@@ -175,7 +175,7 @@ sub.on("event", async (event) => {
     });
 
     // Job 2: Bitcoin
-    const invoice2 = await createInvoice({ lnd, mtokens: "300000" });
+    const invoice2 = await createInvoice({ lnd, mtokens: "3000" });
 
     const btcEvents = await pool.list(relays, [
       {
