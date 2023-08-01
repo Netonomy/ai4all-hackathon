@@ -1,4 +1,6 @@
 import {
+  Event,
+  Relay,
   generatePrivateKey,
   getEventHash,
   getPublicKey,
@@ -121,97 +123,116 @@ export async function getTrendingEvents(): Promise<Event[]> {
   });
 }
 
-const relay = relayInit("wss://relay.damus.io");
-
-await relay.connect();
-
-const sub = relay.sub([
-  {
-    kinds: [65006],
-    since: moment().subtract(2, "minutes").unix(),
-  },
-]);
-
+let relay: Relay;
+let sub;
 let finishedRequests: string[] = [];
 
-sub.on("event", async (event) => {
-  console.log("FULLFILLING JOB REQUEST");
+const initRelay = async () => {
+  relay = relayInit("wss://relay.damus.io");
 
-  if (!finishedRequests.includes(event.id)) {
-    finishedRequests.push(event.id);
-    // Job 1: Trending Events
+  relay.on("disconnect", async () => {
+    console.log("RELAY DISCONNECTED");
+    relay.close();
+    await new Promise((resolve) => setTimeout(resolve, 15 * 1000)); // Wait for 15 seconds
+    console.log("RECONNECTING...");
+    await initRelay(); // Recreate and reconnect the relay
+  });
 
-    const invoice = await createInvoice({ lnd, mtokens: "1000" });
+  await relay.connect();
 
-    let jobResultEvent: any = {
-      kind: 65001,
-      content: JSON.stringify(eventsCache),
-      tags: [
-        ["e", event.id],
-        ["p", event.pubkey],
-        ["s", "success"],
-        ["request", JSON.stringify(event)],
-        ["amount", "1000", invoice.request],
-        ["t", "🔥 Trending Events"],
-      ],
-      pubkey: pk,
-      created_at: Math.floor(Date.now() / 1000),
-    };
+  subscribe();
+};
 
-    jobResultEvent.id = getEventHash(jobResultEvent);
-    jobResultEvent.sig = getSignature(jobResultEvent, sk);
+const subscribe = () => {
+  sub = relay.sub([
+    {
+      kinds: [65006],
+      since: moment().subtract(2, "minutes").unix(),
+    },
+  ]);
 
-    let ok = validateEvent(jobResultEvent);
-    let veryOk = verifySignature(jobResultEvent);
+  sub.on("event", async (event: any) => {
+    console.log("FULLFILLING JOB REQUEST");
 
-    let pubs = relay.publish(jobResultEvent);
+    if (!finishedRequests.includes(event.id)) {
+      finishedRequests.push(event.id);
+      // Job 1: Trending Events
 
-    pubs.on("ok", (relay: any) => {
-      console.log("published okay");
-      console.log(relay);
-    });
-    pubs.on("failed", () => {
-      console.log("Failed to publish job result");
-    });
+      const invoice = await createInvoice({ lnd, mtokens: "1000" });
 
-    // Job 2: Bitcoin
-    const invoice2 = await createInvoice({ lnd, mtokens: "3000" });
+      let jobResultEvent: any = {
+        kind: 65001,
+        content: JSON.stringify(eventsCache),
+        tags: [
+          ["e", event.id],
+          ["p", event.pubkey],
+          ["s", "success"],
+          ["request", JSON.stringify(event)],
+          ["amount", "1000", invoice.request],
+          ["t", "🔥 Trending Events"],
+        ],
+        pubkey: pk,
+        created_at: Math.floor(Date.now() / 1000),
+      };
 
-    const btcEvents = await pool.list(relays, [
-      {
-        kinds: [1],
-        "#t": ["bitcoin", "btc", "₿"],
-        limit: 50,
-      },
-    ]);
+      jobResultEvent.id = getEventHash(jobResultEvent);
+      jobResultEvent.sig = getSignature(jobResultEvent, sk);
 
-    // console.log("BTC events");
-    // console.log(btcEvents);
+      let ok = validateEvent(jobResultEvent);
+      let veryOk = verifySignature(jobResultEvent);
 
-    let bitcoinTopicsJobResult: any = {
-      kind: 65001,
-      content: JSON.stringify(btcEvents),
-      tags: [
-        ["e", event.id],
-        ["p", event.pubkey],
-        ["s", "success"],
-        ["request", JSON.stringify(event)],
-        ["amount", "3000", invoice2.request],
-        ["t", "₿ Bitcoin"],
-      ],
-      pubkey: pk,
-      created_at: Math.floor(Date.now() / 1000),
-    };
-    bitcoinTopicsJobResult.id = getEventHash(bitcoinTopicsJobResult);
-    bitcoinTopicsJobResult.sig = getSignature(bitcoinTopicsJobResult, sk);
+      let pubs = relay.publish(jobResultEvent);
 
-    let pubs2 = relay.publish(bitcoinTopicsJobResult);
+      pubs.on("ok", (relay: any) => {
+        console.log("published okay");
+        console.log(relay);
+      });
+      pubs.on("failed", () => {
+        console.log("Failed to publish job result");
+      });
 
-    pubs2.on("ok", () => {
-      console.log("published okay");
-    });
-    pubs2.on("failed", () => {
-      console.log("Failed to publish job result");
-    });
-  }
-});
+      // Job 2: Bitcoin
+      const invoice2 = await createInvoice({ lnd, mtokens: "3000" });
+
+      const btcEvents = await pool.list(relays, [
+        {
+          kinds: [1],
+          "#t": ["bitcoin", "btc", "₿"],
+          limit: 50,
+        },
+      ]);
+
+      // console.log("BTC events");
+      // console.log(btcEvents);
+
+      let bitcoinTopicsJobResult: any = {
+        kind: 65001,
+        content: JSON.stringify(btcEvents),
+        tags: [
+          ["e", event.id],
+          ["p", event.pubkey],
+          ["s", "success"],
+          ["request", JSON.stringify(event)],
+          ["amount", "3000", invoice2.request],
+          ["t", "₿ Bitcoin"],
+        ],
+        pubkey: pk,
+        created_at: Math.floor(Date.now() / 1000),
+      };
+      bitcoinTopicsJobResult.id = getEventHash(bitcoinTopicsJobResult);
+      bitcoinTopicsJobResult.sig = getSignature(bitcoinTopicsJobResult, sk);
+
+      let pubs2 = relay.publish(bitcoinTopicsJobResult);
+
+      pubs2.on("ok", () => {
+        console.log("published okay");
+      });
+      pubs2.on("failed", () => {
+        console.log("Failed to publish job result");
+      });
+    }
+  });
+};
+
+// Initialize relay and start subscribing
+initRelay();
