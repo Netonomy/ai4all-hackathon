@@ -4,7 +4,7 @@ import SideDrawer from "../../components/SideDrawer";
 import PageContainer from "@/components/containers/PageContainer";
 import TabSelctor from "./TabSelector";
 import BackBtn from "@/components/BackBtn";
-import Header from "../Header";
+import Header from "@/app/Header";
 
 export default function StorageLayout({ children }: { children: ReactNode }) {
   return (

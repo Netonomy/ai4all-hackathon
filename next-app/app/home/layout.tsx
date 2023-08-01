@@ -1,6 +1,6 @@
 import PageContainer from "@/components/containers/PageContainer";
 import PrivateRoute from "@/components/PrivateRoute";
-import Header from "../Header";
+import Header from "@/app/Header";
 import AgentChatBtn from "./AgentChatBtn";
 
 export default function HomeLayout({
