@@ -16,7 +16,7 @@ Netonomy aims to help people and organizations take control of their digital ide
 
 ### 🎥 AI4All Hackathon Presentation
 
-https://www.loom.com/share/6714ff4fe0c944909278e252e2159e14
+https://www.loom.com/share/cfa7055d63a34ccd81e61f7f9cd1113f?sid=c7839871-dfb3-4c8a-af38-aa938fa88750
 
 ## 🏛️ Architecture
 
@@ -24,4 +24,4 @@ https://www.loom.com/share/6714ff4fe0c944909278e252e2159e14
 
 ## License
 
-Netonomy Wallet is licensed under the terms of the [Apache License](LICENSE).
+Netonomy is licensed under the terms of the [Apache License](LICENSE).
