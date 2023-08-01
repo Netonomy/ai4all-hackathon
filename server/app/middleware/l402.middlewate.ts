@@ -55,12 +55,12 @@ async function createAndSendMacaroonAndInvoice(res: Response) {
     JSON.stringify(macaroon.exportJSON())
   ).toString("base64");
 
-  res.status(402);
-  res.header("Access-Control-Expose-Headers", "www-authenticate");
   res.set(
     "www-authenticate",
     `L402 macaroon=${base64Macaroon}, invoice=${invoice!.request}`
   );
+  res.header("Access-Control-Expose-Headers", "www-authenticate");
+  res.status(402);
   return res.end();
 }
 

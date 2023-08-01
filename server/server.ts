@@ -161,8 +161,9 @@ sub.on("event", async (event) => {
 
     let pubs = pool.publish(relays, jobResultEvent);
 
-    pubs.on("ok", () => {
+    pubs.on("ok", (relay: any) => {
       console.log("published okay");
+      console.log(relay);
     });
     pubs.on("failed", () => {
       console.log("Failed to publish job result");

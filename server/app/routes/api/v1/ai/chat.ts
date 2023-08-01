@@ -21,6 +21,7 @@ import {
   getEventHash,
   getPublicKey,
   getSignature,
+  relayInit,
 } from "nostr-tools";
 import { L402Auth } from "../../../../middleware/l402.middlewate.js";
 
@@ -40,7 +41,11 @@ let relays = [
 ];
 
 async function publishJob(): Promise<string> {
-  return new Promise((resolve, reject) => {
+  return new Promise(async (resolve, reject) => {
+    const relay = relayInit("wss://relay.damus.io");
+
+    await relay.connect();
+
     // Create Job Request for algorithmic feed
     let jobRequestEvent: any = {
       kind: 65006,
@@ -53,7 +58,7 @@ async function publishJob(): Promise<string> {
     jobRequestEvent.sig = getSignature(jobRequestEvent, sk);
 
     // Publish Job
-    let pubs = pool.publish(relays, jobRequestEvent);
+    let pubs = relay.publish(jobRequestEvent);
     pubs.on("ok", () => {
       console.log("published okay");
       resolve(jobRequestEvent.id);
@@ -61,27 +66,6 @@ async function publishJob(): Promise<string> {
     pubs.on("failed", () => {
       console.log("Failed to publish job result");
       reject(`Failed to publish event: ${JSON.stringify(jobRequestEvent)}`);
-    });
-  });
-}
-
-async function getJobDetails(eventId: string): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const pubs = pool.sub(relays, [
-      {
-        "#e": [eventId],
-        kinds: [65001, 65000],
-      },
-    ]);
-
-    let eventIds: any = [];
-
-    pubs.on("event", (event: any) => {
-      eventIds.push(event.id);
-      console.log(event);
-    });
-    pubs.on("eose", () => {
-      resolve(JSON.stringify(eventIds));
     });
   });
 }
