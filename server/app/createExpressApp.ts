@@ -20,19 +20,18 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Netonomy API",
+      title: "Netonomy Server",
       version: "0.0.1",
-      description: "Be your own Server.",
     },
     components: {
       securitySchemes: {
-        bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-          description:
-            "Bearer token to access api calls. Private to the API owner",
-        },
+        // bearerAuth: {
+        //   type: "http",
+        //   scheme: "bearer",
+        //   bearerFormat: "JWT",
+        //   description:
+        //     "Bearer token to access api calls. Private to the API owner",
+        // },
         macaroonAuth: {
           type: "apiKey",
           in: "header",

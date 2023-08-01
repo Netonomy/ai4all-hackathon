@@ -133,6 +133,7 @@ sub.on("event", async (event) => {
   console.log("FULLFILLING JOB REQUEST");
 
   if (!finishedRequests.includes(event.id)) {
+    finishedRequests.push(event.id);
     // Job 1: Trending Events
 
     const invoice = await createInvoice({ lnd, mtokens: "100000" });
@@ -206,7 +207,5 @@ sub.on("event", async (event) => {
     pubs2.on("failed", () => {
       console.log("Failed to publish job result");
     });
-
-    finishedRequests.push(event.id);
   }
 });
