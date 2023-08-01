@@ -23,6 +23,7 @@ import {
   getPublicKey,
   getSignature,
 } from "nostr-tools";
+import { L402Auth } from "../../../../middleware/l402.middlewate.js";
 
 let sk = generatePrivateKey(); // `sk` is a hex string
 let pk = getPublicKey(sk); // `pk` is a hex string
@@ -78,6 +79,7 @@ async function getJobDetails(eventId: string): Promise<string> {
 
     pubs.on("event", (event: any) => {
       eventIds.push(event.id);
+      console.log(event);
     });
     pubs.on("eose", () => {
       resolve(JSON.stringify(eventIds));
@@ -129,21 +131,10 @@ async function getJobDetails(eventId: string): Promise<string> {
  */
 export default Router({ mergeParams: true }).post(
   "/v1/ai/chat",
-  // authenticateToken,
+  L402Auth,
   async (req, res) => {
     try {
       let tools: Tool | StructuredTool[] = [
-        new DynamicTool({
-          name: "bitcoin-address-generator",
-          description:
-            "call this function to generate a new on chain bitcoin address to recieve bitcoin. The input is a empty string.",
-          func: async () => {
-            const format = "p2wpkh";
-            const address = (await createChainAddress({ lnd, format })).address;
-
-            return address;
-          },
-        }),
         new DynamicTool({
           name: "current-date",
           description: "useful when you need to know the current date",

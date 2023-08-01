@@ -8,40 +8,47 @@ export async function L402Auth(
   res: Response,
   next: NextFunction
 ) {
-  const authHeader = req.headers.authorization;
+  try {
+    const authHeader = req.headers.authorization;
 
-  if (!authHeader) {
-    return createAndSendMacaroonAndInvoice(res);
-  }
+    if (!authHeader) {
+      return createAndSendMacaroonAndInvoice(res);
+    }
 
-  const [authType, authValue] = authHeader.split(" ");
+    const [authType, authValue] = authHeader.split(" ");
 
-  if (authType !== "L402" || !isValidAuthValue(authValue)) {
-    return res.status(401).json({
-      message: "Invalid Authorization header.",
+    if (authType !== "L402") {
+      return res.status(401).json({
+        message: "Invalid Authorization header.",
+      });
+    }
+
+    const [macaroon, preimage] = authValue.split(":");
+
+    const isValid = await validateMacaroonAndInvoice(macaroon, preimage);
+    if (!isValid) {
+      return res.status(401).json({
+        message: "Invalid preimage provided.",
+      });
+    }
+
+    next();
+  } catch (err) {
+    return res.status(400).json({
+      status: "ERROR",
+      message: (err as any).message,
     });
   }
-
-  const [macaroon, preimage] = authValue.split(":");
-
-  const isValid = await validateMacaroonAndInvoice(macaroon, preimage);
-  if (!isValid) {
-    return res.status(401).json({
-      message: "Invalid preimage provided.",
-    });
-  }
-
-  next();
 }
 
 async function createAndSendMacaroonAndInvoice(res: Response) {
-  const invoice = await createInvoice({ lnd, mtokens: "10000" });
+  const invoice = await createInvoice({ lnd, tokens: 100 });
 
   const macaroon = Macaroon.newMacaroon({
     version: 1,
     rootKey: process.env.TOKEN_SECRET,
-    identifier: invoice.id,
-    location: "http://localhost:3300",
+    identifier: invoice!.id,
+    location: process.env.LOCATION,
   });
 
   const base64Macaroon = Buffer.from(
@@ -49,9 +56,10 @@ async function createAndSendMacaroonAndInvoice(res: Response) {
   ).toString("base64");
 
   res.status(402);
+  res.header("Access-Control-Expose-Headers", "www-authenticate");
   res.set(
-    "WWW-Authenticate",
-    `L402 macaroon=${base64Macaroon}, invoice=${invoice.request}`
+    "www-authenticate",
+    `L402 macaroon=${base64Macaroon}, invoice=${invoice!.request}`
   );
   return res.end();
 }
